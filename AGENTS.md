@@ -16,8 +16,8 @@ Populate the `<harness>/<model` part with appropriate values.
 
 ## What this repo is
 
-We are speccing out the Thunderjar application, as described in
-[docs/conversation_json.md](docs/conversation_json.md) (the source design conversation).
+We are speccing out the Thunderjar application, as described in the source design
+conversation, split by topic in [docs/conversation/](docs/conversation/README.md).
 This repo does not contain Thunderjar's implementation — just the spec.
 
 ## Spec conventions
@@ -31,6 +31,10 @@ This repo does not contain Thunderjar's implementation — just the spec.
 ## Folder structure
 
 - `docs/` — source material: the raw and extracted design conversation(s) this spec is derived from.
+- `docs/conversation/` — the design conversation split into topic files. Start at its
+  `README.md` (index, terminology drift, decisions) and read only the parts you need.
+  Don't read `docs/conversation_json.md` or `docs/conversation_raw.json` unless you need
+  to check the original wording.
 - `spec/` — the spec itself, one file per concern. See `spec/README.md` for the index and reading order.
 - `spec/*.raw.md` — the user's own scratch notes for the corresponding spec page (e.g.
   `03-terminology.raw.md` for `03-terminology.md`). Do not read these unless the user
