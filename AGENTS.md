@@ -20,10 +20,21 @@ We are speccing out the Thunderjar application, as described in
 [docs/conversation_json.md](docs/conversation_json.md) (the source design conversation).
 This repo does not contain Thunderjar's implementation — just the spec.
 
+## Spec conventions
+
+- The spec is a work in progress. Nothing written down in `spec/` should be treated as
+  canonical or final — it reflects current thinking, not a locked decision.
+- A paragraph starting with 🙋‍♂️ is a note from the user *about* the documentation itself
+  (a comment, correction, or question on what's written), not part of the spec's actual
+  content. Don't fold it into surrounding prose as if it were a spec statement.
+
 ## Folder structure
 
 - `docs/` — source material: the raw and extracted design conversation(s) this spec is derived from.
 - `spec/` — the spec itself, one file per concern. See `spec/README.md` for the index and reading order.
+- `spec/*.raw.md` — the user's own scratch notes for the corresponding spec page (e.g.
+  `03-terminology.raw.md` for `03-terminology.md`). Do not read these unless the user
+  specifically points you at one.
 
 ## Working style
 
