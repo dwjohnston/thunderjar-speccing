@@ -38,6 +38,9 @@ This repo does not contain Thunderjar's implementation — just the spec.
 
 ## Working style
 
+- Before starting any task, read all of the spec files in `spec/` (see `spec/README.md`
+  for the index and reading order). The spec pages are interconnected, so partial context
+  risks contradicting or duplicating existing decisions.
 - Err on the side of brevity in spec pages. If more detail is needed, the user will ask for it.
 - Update this file as we go. If the user gives a nudge or piece of guidance that reflects a
   general principle (not a one-off), suggest the AGENTS.md update and ask before adding it.
