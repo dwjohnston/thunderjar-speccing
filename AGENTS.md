@@ -20,13 +20,19 @@ We are speccing out the Thunderjar application, as described in the source desig
 conversation, split by topic in [docs/conversation/](docs/conversation/README.md).
 This repo does not contain Thunderjar's implementation — just the spec.
 
+**Do not read `docs/conversation/`, `docs/conversation_json.md` or
+`docs/conversation_raw.json` directly.** They are long and slow to read. Instead,
+invoke the `query-conversation` skill with the question you need answered. Only read
+the source files yourself when the skill's answer cites a location and you need to
+verify the exact original wording.
+
 ## Current phase
 
 We're actively defining out the project — filling in stub spec pages from the design
 conversation — while also deliberately constraining what's in scope for v1. When
 something comes up that's a reasonable idea but not needed for v1, prefer flagging it
 as a non-goal over speccing it out in detail. See
-[`spec/02-goals-non-goals.md`](spec/02-goals-non-goals.md).
+[`spec/020-goals-non-goals.md`](spec/020-goals-non-goals.md).
 
 ## Spec conventions
 
@@ -36,8 +42,8 @@ as a non-goal over speccing it out in detail. See
   (a comment, correction, or question on what's written), not part of the spec's actual
   content. Don't fold it into surrounding prose as if it were a spec statement.
 - Whenever something is identified as out of scope, record it in
-  `spec/02-goals-non-goals.md` (a non-goal), not just in the page where it came up.
-- `spec/02-goals-non-goals.md` also has a "To revisit" section, for a different thing:
+  `spec/020-goals-non-goals.md` (a non-goal), not just in the page where it came up.
+- `spec/020-goals-non-goals.md` also has a "To revisit" section, for a different thing:
   unresolved questions we **are** intending to address in v1, just not yet settled — as
   opposed to non-goals, which are explicitly deferred past v1. Don't conflate the two;
   file each in its own section, cross-linked with the page where the question came up.
@@ -46,7 +52,7 @@ as a non-goal over speccing it out in detail. See
   concrete example block showing real, filled-in values. Never leave a format defined
   only in the abstract.
 - Backlinks: whenever a page states or relies on a decision that's actually owned by
-  another page (not just a `03-terminology.md` glossary entry — any decision on any
+  another page (not just a `030-terminology.md` glossary entry — any decision on any
   page), link to that source page, and add a `_(Referenced by: <this page>.)_` note at
   the exact point in the source page where the decision is stated. Before changing a
   decision that has "Referenced by" notes, check and update each listed page too. Notes
@@ -61,7 +67,7 @@ as a non-goal over speccing it out in detail. See
   to check the original wording.
 - `spec/` — the spec itself, one file per concern. See `spec/README.md` for the index and reading order.
 - `spec/*.raw.md` — the user's own scratch notes for the corresponding spec page (e.g.
-  `03-terminology.raw.md` for `03-terminology.md`). Do not read these unless the user
+  `030-terminology.raw.md` for `030-terminology.md`). Do not read these unless the user
   specifically points you at one.
 
 ## Working style
