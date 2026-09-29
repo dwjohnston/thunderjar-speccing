@@ -47,6 +47,18 @@ as a non-goal over speccing it out in detail. See
   unresolved questions we **are** intending to address in v1, just not yet settled — as
   opposed to non-goals, which are explicitly deferred past v1. Don't conflate the two;
   file each in its own section, cross-linked with the page where the question came up.
+- `spec/021-human-zone-out.md` records a third, different thing: places the user has
+  flagged that they stopped paying close attention. Unlike the two sections above, an
+  entry says nothing about whether the content is resolved — it may be entirely correct.
+  It says the content was never really reviewed, so it carries less authority than the
+  prose around it and must not be cited as a settled decision. When a later task depends
+  on something listed there, say so and get it confirmed rather than building on it
+  silently. Add an entry whenever the user says they've zoned out, lost track, or waved
+  something through; name the page and section, and be specific about which parts were
+  agent-proposed rather than user-decided. You may *offer* to add one when a decision was
+  largely yours and passed without pushback, but ask first — this is the user's flag to
+  raise, not a self-assessment you file on their behalf. Remove an entry once they've
+  reviewed it properly, whether or not the content changed.
 - Whenever a page defines a format or syntax (a tag scheme, a config shape, a naming
   convention, etc.), always follow the abstract `<placeholder>` definition with a
   concrete example block showing real, filled-in values. Never leave a format defined
