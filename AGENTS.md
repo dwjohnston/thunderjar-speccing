@@ -69,6 +69,11 @@ as a non-goal over speccing it out in detail. See
   "now", "no longer", "moved from". State what the design is, not how it got there.
 - Before finishing a page, check every count, list and table: is each item real in v1?
   If not, take it out of the list.
+- When a page lists options that are still undecided, give each one a short name (e.g.
+  *instrument-owned*, *measurement-chosen*) and use it in the option's heading. Refer to
+  options by name, in the spec and in conversation, never by list position: positions
+  shift when an option is added or ruled out, and names don't. Ruled-out options keep
+  their names, listed under a "Ruled out" heading, rather than being deleted.
 - Whenever a page defines a format or syntax (a tag scheme, a config shape, a naming
   convention, etc.), always follow the abstract `<placeholder>` definition with a
   concrete example block showing real, filled-in values. Never leave a format defined
