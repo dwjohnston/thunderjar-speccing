@@ -59,6 +59,16 @@ as a non-goal over speccing it out in detail. See
   largely yours and passed without pushback, but ask first — this is the user's flag to
   raise, not a self-assessment you file on their behalf. Remove an entry once they've
   reviewed it properly, whether or not the content changed.
+- **Describe v1 as it is.** Everything in a page's main body must be true of v1. Don't
+  describe a fuller design and then walk parts of it back ("three tiers — but the third
+  isn't populated"). If something is deferred, leave it out of the main description and
+  mention it once, in a short "Future" note at the end of the section, linking to its
+  non-goal in `020-goals-non-goals.md`.
+- **Don't write the spec as a diff.** The reader hasn't seen earlier versions of the page
+  or the conversation behind it. Avoid framing like "extends X to…", "not A but B",
+  "now", "no longer", "moved from". State what the design is, not how it got there.
+- Before finishing a page, check every count, list and table: is each item real in v1?
+  If not, take it out of the list.
 - Whenever a page defines a format or syntax (a tag scheme, a config shape, a naming
   convention, etc.), always follow the abstract `<placeholder>` definition with a
   concrete example block showing real, filled-in values. Never leave a format defined
