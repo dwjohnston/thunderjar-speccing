@@ -58,6 +58,16 @@ conversation. The current state of the files is taken as the source of truth.
   error (051, Typed names). Mixed experiments are declared as two experiments. Working
   demo of the types in `scratchpad/harness-model-types/index.ts`. Possible later change:
   move the map to its own file in the harness folder.
+- **Item 5, floating parameters** (uncommitted). Not a first-class primitive. A
+  declaration can control its content hash with one of two optional functions:
+  `additionalHash: () => string` (hashed with the folder's content) or
+  `determineHash: () => string` (hashed instead of it). Each returns a shell command
+  (*returns-command*, chosen over *returns-value*); Thunderjar runs it on the host and
+  hashes the output. The output reaches `applyParameter` as `ctx.resolvedHash`, so the
+  Dockerfile fragment changes when the hash does. A parameter that follows a moving
+  target is one that uses `determineHash`, for example returning `git rev-parse main`.
+  Specced in 060, "Controlling the content hash". "Floating parameter" is a usage-guide
+  term only.
 - `spec/003-critical-issues.md` added, for design problems that block other work. None
   open.
 - AGENTS.md: undecided options are given short names, used in their headings, and never
@@ -65,22 +75,16 @@ conversation. The current state of the files is taken as the source of truth.
 
 ## Needs discussion
 
-1. **Floating parameters.** Mentioned in 085, never defined. The offline notes say this is
-   the comparison flow that really matters ("the most recent commit", mostly for code
-   state and prompt set, possibly harness and model versions). The tension is that a
-   floating value has no fixed content hash, and comparability depends on content hashes.
-   Likely answer: it resolves to a pinned value at execution time, and that value's hash
-   is recorded. Needs confirming.
-2. **Where measurements live in the spec.** The offline task was to move them from 060
+1. **Where measurements live in the spec.** The offline task was to move them from 060
    into 065 (065 is now the Model page, so the next free number is 067). Since then the user created an empty `086-collecting-measurements.md`, and
    085 already covers applying measurements. Proposal: 067 for how measurements are
    declared (instruments, `MeasurementContext`, `templateTest`), and 086 for how they are
    collected and stored, taken out of 085. Needs confirming before anything moves.
-3. **The `testRunner` setting.** `templateTest` relies on it, but the only place it's
+2. **The `testRunner` setting.** `templateTest` relies on it, but the only place it's
    configured is a comment in 051. Open: where it's configured (050, the global config
    page, is a stub), and how it gets into the measurement container. That second part
    probably joins "Thunderjar's own injected setup" in 020's To revisit.
-4. **Reviewing 021.** The user flagged these as not yet reviewed: the `MeasurementContext`
+3. **Reviewing 021.** The user flagged these as not yet reviewed: the `MeasurementContext`
    field list, the `templateTest` config shape, the types in 087 (`TokenCosts`,
    `reason` values, `/thunderjar/result.json`, never-zero-fill), and the remaining record
    shapes in 085 (`RecordedMeasure`, `ContainerRunRecord`, `measuredAt`, storing
@@ -110,5 +114,4 @@ conversation. The current state of the files is taken as the source of truth.
 
 ## Suggested next
 
-Item 1, floating parameters. It changes what `declareExperiment` looks like, and 051
-already shows it.
+Item 1, where measurements live in the spec.
