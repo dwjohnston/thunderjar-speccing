@@ -106,3 +106,6 @@ as a non-goal over speccing it out in detail. See
 - Update this file as we go. If the user gives a nudge or piece of guidance that reflects a
   general principle (not a one-off), suggest the AGENTS.md update and ask before adding it.
   Never update this file automatically/silently.
+
+
+☝️ **Remember:** Err on the side of brevity. It is much easier for the human reader to read something and recognise that something is missing, and ask for more, than it is for a human to read and parse something and make the determination that the thing is not needed.
