@@ -1,7 +1,7 @@
 # Thunderjar spec — what's left to discuss
 
 Snapshot as of 2026-10-01, branch `docker-execution-spec` in `thunderjar2/`, last commit
-`7676ae5`.
+`c6353c9`.
 
 ## Context: how we got here
 
@@ -49,32 +49,38 @@ conversation. The current state of the files is taken as the source of truth.
   it with no history kept. The set hash is derived from sorted `name:hash` pairs. Deleted
   measurements are kept in iteration Results but excluded from aggregation results
   (keep-but-exclude). A rename is treated as a delete plus an add (rename-is-new).
+- **Item 4, how harnesses and models relate** (`c6353c9`). The harness declares a
+  `models` map (model name → the ID it passes on the command line, as `ctx.modelId`). It
+  is the only place that says which models a harness runs. The map is excluded from the
+  harness's content hash; the resolved model ID goes into the parameter hash. A model's
+  identity is its folder name. `harness` and `model` stay as a cross product in
+  `declareExperiment`, and listing a model that one of the harnesses can't run is a type
+  error (051, Typed names). Mixed experiments are declared as two experiments. Working
+  demo of the types in `scratchpad/harness-model-types/index.ts`. Possible later change:
+  move the map to its own file in the harness folder.
+- `spec/003-critical-issues.md` added, for design problems that block other work. None
+  open.
 - AGENTS.md: undecided options are given short names, used in their headings, and never
   referred to by position.
 
 ## Needs discussion
 
-1. **How harnesses and models relate.** From the offline notes: `availableModels` on the
-   harness, `harnessSpecificMapping` on the model, and possibly a "harness family" to cut
-   down repetition. The user prefers the simpler model even if it's more verbose. Not in
-   the spec yet. It blocks typing `declareExperiment`: a harness paired with a model it
-   can't run should be a type error.
-2. **Floating parameters.** Mentioned in 085, never defined. The offline notes say this is
+1. **Floating parameters.** Mentioned in 085, never defined. The offline notes say this is
    the comparison flow that really matters ("the most recent commit", mostly for code
    state and prompt set, possibly harness and model versions). The tension is that a
    floating value has no fixed content hash, and comparability depends on content hashes.
    Likely answer: it resolves to a pinned value at execution time, and that value's hash
    is recorded. Needs confirming.
-3. **Where measurements live in the spec.** The offline task was to move them from 060
-   into 065. Since then the user created an empty `086-collecting-measurements.md`, and
-   085 already covers applying measurements. Proposal: 065 for how measurements are
+2. **Where measurements live in the spec.** The offline task was to move them from 060
+   into 065 (065 is now the Model page, so the next free number is 067). Since then the user created an empty `086-collecting-measurements.md`, and
+   085 already covers applying measurements. Proposal: 067 for how measurements are
    declared (instruments, `MeasurementContext`, `templateTest`), and 086 for how they are
    collected and stored, taken out of 085. Needs confirming before anything moves.
-4. **The `testRunner` setting.** `templateTest` relies on it, but the only place it's
+3. **The `testRunner` setting.** `templateTest` relies on it, but the only place it's
    configured is a comment in 051. Open: where it's configured (050, the global config
    page, is a stub), and how it gets into the measurement container. That second part
    probably joins "Thunderjar's own injected setup" in 020's To revisit.
-5. **Reviewing 021.** The user flagged these as not yet reviewed: the `MeasurementContext`
+4. **Reviewing 021.** The user flagged these as not yet reviewed: the `MeasurementContext`
    field list, the `templateTest` config shape, the types in 087 (`TokenCosts`,
    `reason` values, `/thunderjar/result.json`, never-zero-fill), and the remaining record
    shapes in 085 (`RecordedMeasure`, `ContainerRunRecord`, `measuredAt`, storing
@@ -104,4 +110,5 @@ conversation. The current state of the files is taken as the source of truth.
 
 ## Suggested next
 
-Items 1 and 2. Both change what `declareExperiment` looks like, and 051 already shows it.
+Item 1, floating parameters. It changes what `declareExperiment` looks like, and 051
+already shows it.
