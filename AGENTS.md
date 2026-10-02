@@ -78,6 +78,9 @@ as a non-goal over speccing it out in detail. See
   convention, etc.), always follow the abstract `<placeholder>` definition with a
   concrete example block showing real, filled-in values. Never leave a format defined
   only in the abstract.
+- Whenever a CLI usage line contains `<angle>` syntax, an example block with real,
+  filled-in values follows it immediately, before any prose. This applies to every
+  command in `spec/100-cli-reference.md`.
 - Backlinks: whenever a page states or relies on a decision that's actually owned by
   another page (not just a `030-terminology.md` glossary entry — any decision on any
   page), link to that source page, and add a `_(Referenced by: <this page>.)_` note at
