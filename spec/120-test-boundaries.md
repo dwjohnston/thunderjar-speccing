@@ -70,6 +70,7 @@ Given that a real pre-run image like this exists, run the fake agent. A new real
 - These files exist.
 - The git history is correct.
 - The labels are correct.
+- No secret value appears in the image's config or in any file `docker diff` reports as changed. The fake harness declares a `requiredEnv` whose fixture value the test knows, so it can search for it. See [082-keeping-secrets-secret.md](082-keeping-secrets-secret.md#checks).
 
 The agent is faked through the normal harness mechanism. The harness config already holds the exact CLI command to run for an agent, so the fake harness is just another harness entry whose command is a script (e.g. `node fake-agent.js`). It is not a special test-only code path. Because the script makes a known set of file changes, the resulting image can be checked exactly.
 
@@ -110,7 +111,7 @@ None of the layers exercises a real harness talking to a real model. A small smo
 - **Shared history for restore.** The 3.4 fixture image holds a repository with fixed history, and the test's throwaway repository should share it. Suggested: one seed script, with fixed author and dates, creates the same initial commit in both.
 - **Fake harness failure modes.** Should it be parameterised to crash, time out, never commit, or emit a malformed result? Should a contract check confirm its output shape matches the real harnesses?
 - **How to inspect an image.** `docker run --rm <image> git log ...` versus exporting the filesystem. Either way, is there a helper that turns an image reference into a plain object for assertions?
-- **How far image assertions go.** Candidates beyond those listed: tag equals the parameter hash, absent files are absent (no host leakage, no credentials), base layers match the declared base image digest, metadata report matches the image.
+- **How far image assertions go.** Candidates beyond those listed: tag equals the parameter hash, absent files are absent (no host leakage), base layers match the declared base image digest, metadata report matches the image.
 - **Instruments in layer 1 versus 3.3.** A unit-test instrument needs the runtime environment, not just files, so it cannot be tested as a pure function over a fixture directory. 3.3 may be where such instruments are tested, leaving layer 1 for file-only instruments.
 - **Registry push/pull.** Not a current concern. If it is tested, a throwaway local registry container is preferred over a mock.
 - **What blocks CI.** Only the smoke test is stated as non-blocking. Whether the Docker image tests (layer 3) run on every change or are tagged out of the fast loop is undecided.

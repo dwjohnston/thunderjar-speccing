@@ -44,6 +44,12 @@ What's in scope vs. explicitly not.
   in the prompt cache question under "To revisit". (See
   [050-setup-and-configure.md](050-setup-and-configure.md#thunderjarconfigts).)
 
+- **Harnesses that authenticate from a stored credential file.** A tool that can only log
+  in through a persisted file (an OAuth login state, say) rather than an environment
+  variable would leave that file in the postrun image. v1 supports environment-variable
+  credentials only. (See
+  [082-keeping-secrets-secret.md](082-keeping-secrets-secret.md#the-harness-must-not-persist-credentials).)
+
 ## To revisit
 
 Unresolved, but things we *are* intending to address in v1 — unlike the non-goals above.

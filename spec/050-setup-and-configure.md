@@ -104,7 +104,10 @@ under Credentials.
 Each [harness](064-harness.md#requiredenv-credentials) declares the names of the
 environment variables its agent needs (`requiredEnv`). The user exports them in the shell
 or CI secret store that runs Thunderjar. Thunderjar passes only those variables into that
-harness's containers, and fails before building anything if one is unset.
+harness's containers, through a mounted file rather than `docker run -e` so they never
+reach the postrun image (see
+[082-keeping-secrets-secret.md](082-keeping-secrets-secret.md)), and fails before
+building anything if one is unset.
 
 `thunderjar.config.ts` has no environment section, and no secret is ever written to a
 config file, an image or the run data store.
@@ -134,7 +137,7 @@ Three rules, all of the same shape: config names things, never holds secrets.
 
 | What | How it authenticates | Who reads it |
 |---|---|---|
-| Harness (agent API key) | `requiredEnv` on the harness declaration | Passed into that harness's containers |
+| Harness (agent API key) | `requiredEnv` on the harness declaration | Passed into that harness's containers via a mounted file ([082](082-keeping-secrets-secret.md)) |
 | Run data store (remote) | An env var named in the config, holding a connection URL with credentials, e.g. `urlEnv: "THUNDERJAR_DB_URL"` | The Thunderjar process on the host. No container sees it. |
 | Image store | The user's existing `docker login` for the registry. Thunderjar holds no registry credentials. In CI the pipeline logs in first. | Docker |
 
