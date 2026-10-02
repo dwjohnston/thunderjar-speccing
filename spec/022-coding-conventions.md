@@ -83,3 +83,21 @@ thunderjar/_generated/
 - **Git-ignored**, because it is derived entirely from the folder structure. Committing it
   invites a stale copy that disagrees with the folders it was generated from.
 
+
+## Verification
+
+Demo: [`scratchpad/verification/022-declare-functions/`](../scratchpad/verification/022-declare-functions/test.sh)
+(output in `output.txt`; run with `tsc` 6.0.2 `--strict` and git).
+
+- **Verified by demo:** `ctx`/`raw` are inferred through a `declareX(h: X)` function and a bare object gets
+  implicit `any`; `as` compiles with a required field missing; `satisfies` reports a wrong field type;
+  a bare object with no annotation compiles with the wrong shape; `declareX` reports the same wrong type;
+  `thunderjar/_generated/` in `.gitignore` ignores the generated file.
+- **Docs (not fetched; the sandbox proxy blocked typescriptlang.org and git-scm.com):**
+  [`satisfies`](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html),
+  [type assertions](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions),
+  [gitignore patterns](https://git-scm.com/docs/gitignore).
+- **Nuance:** `as` is not always silent. TypeScript rejects assertions between types that don't
+  sufficiently overlap (TS2352), so it only hides errors such as a missing required field.
+- **Not verified:** the `@anthropic-ai/claude-code` package name and the `claude -p` flag are taken from the
+  example and belong to [064-harness.md](064-harness.md); `2.1.283` is an illustrative version.

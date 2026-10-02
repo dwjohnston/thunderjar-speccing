@@ -1,0 +1,21 @@
+global bun on PATH? no
+
+added 3 packages in 1s
+--- node_modules/.bin:
+bun
+bunx
+tj
+--- via npx (PATH gets node_modules/.bin):
+hello from bun 1.4.2
+--- node_modules/.bin/tj directly (PATH not set up):
+/usr/bin/env: 'bun': No such file or directory
+--- npm run script:
+hello from bun 1.4.2
+--- install with --ignore-scripts:
+
+added 3 packages in 1s
+Error: Bun's postinstall script was not run.
+
+This occurs when using --ignore-scripts during installation, or when using a
+package manager like pnpm that does not run postinstall scripts by default.
+

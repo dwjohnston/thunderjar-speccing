@@ -103,3 +103,9 @@ Both prerun images are reused as-is; only new postrun images are produced.
   other's postrun images. A ULID's random component avoids that by construction; getting
   the same safety from a date format would need enough extra precision/disambiguation
   that it stops being more readable anyway.
+
+## Verification
+
+- Tag grammar: a Docker tag is `[\w][\w.-]{0,127}` (max 128 chars, no `:`/spaces, can't start with `.` or `-`), per the [distribution reference grammar](https://github.com/distribution/reference/blob/main/reference.go) and the [`docker image tag` docs](https://docs.docker.com/reference/cli/docker/image/tag/). Both tag formats are valid, including with a full 26-character ULID (49 chars). Demo: [`scratchpad/verification/081-docker-tagging/`](../scratchpad/verification/081-docker-tagging/test.sh) (regex check only; the sandbox has no Docker daemon, and docs.docker.com was blocked, so the grammar is from the reference source/known docs and not re-fetched).
+- Flag: the example execution ID `01k4x9j2e8mqz3` is 14 characters, but a ULID is [26 characters](https://github.com/ulid/spec) (Crockford base32, canonically uppercase; lowercase is valid in tags). The examples are illustrative only.
+- Not verified: "git-style" 8-character abbreviation is a design choice (git's default minimum is 7).

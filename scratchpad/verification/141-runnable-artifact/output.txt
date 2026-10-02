@@ -1,0 +1,14 @@
+global bun on PATH: none
+pinning bun exactly to 1.4.2
+--- node_modules/.bin:
+bun
+bunx
+thunderjar
+--- bun version in .bin:
+1.4.2
+--- npx thunderjar (no global bun):
+runtime: bun 1.4.2 | config: {"name":"demo"}
+--- npm run script:
+runtime: bun 1.4.2 | config: {"name":"demo"}
+--- direct ./node_modules/.bin/thunderjar with .bin NOT on PATH:
+/usr/bin/env: 'bun': No such file or directory

@@ -228,3 +228,13 @@ Run from inside a git repository. Fetches the run's end state and creates the br
   lists recent executions.
 - **Narrowing a `run`.** Whether and how to run a subset of permutations.
 - **Exit codes.** The exact values, and what counts as a regression.
+
+## Verification
+
+- The `thunderjar/<container run>` branch name is a valid git ref, and the example
+  execution IDs are well-formed ULIDs ([ULID spec](https://github.com/ulid/spec)). Demo:
+  [`scratchpad/verification/100-cli-reference/`](../scratchpad/verification/100-cli-reference/test.sh)
+  ([output](../scratchpad/verification/100-cli-reference/output.txt)), using
+  [`git check-ref-format`](https://git-scm.com/docs/git-check-ref-format).
+- Not verified: Docker daemon, registry push and run-data-store checks in `doctor` (no
+  Docker daemon in the sandbox; the rest is Thunderjar design, not external behaviour).

@@ -1,0 +1,4 @@
+tsc version: Version 6.0.2
+--- expect exactly one error (the claude-code/gpt-5 line) ---
+../../../../../..pairs.ts(7,7): error TS2820: Type '"claude-code@2.2.0/gpt-5"' is not assignable to type 'Pair'. Did you mean '"claude-code@2.2.0/sonnet-4-5"'?
+tsc exit: 2

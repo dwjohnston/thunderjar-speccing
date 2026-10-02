@@ -48,3 +48,9 @@ Run time only. The harness's `cli` receives the resolved ID as `ctx.modelId`.
 
 Sub-agent models aren't controlled here. They're recorded as outcomes, in the per-model
 breakdown of [087-collecting-token-costs.md](087-collecting-token-costs.md).
+
+## Verification
+
+- Verified: `claude-haiku-4-5-20251001` is the Claude API ID for Claude Haiku 4.5 (alias `claude-haiku-4-5`), per the [models overview](https://platform.claude.com/docs/en/about-claude/models/overview).
+- Note: the same page lists Haiku 4.5's retirement as "not sooner than October 15, 2026", so a `haiku-4-5` model may stop being runnable soon.
+- Not verified (design choices, no external claim): that other harnesses spell the same model differently; see the [064-harness.md](064-harness.md) page for each harness's own claims.

@@ -103,3 +103,23 @@ Unresolved, but things we *are* intending to address in v1 — unlike the non-go
 ## Open questions
 
 _TBD_
+
+## Verification
+
+Checked against official docs:
+
+- No cache-key parameter exists; hits need identical prefixes. Caches are isolated per
+  workspace on the Claude API, and per organization on Bedrock and Google Cloud. Default
+  TTL is 5 minutes, with an optional 1-hour TTL.
+  ([Prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching))
+- `CLAUDE_CODE_PROMPT_CACHE_TTL` accepts `5m` or `1h` (needs Claude Code v2.1.242+), and
+  `ANTHROPIC_CUSTOM_HEADERS` sets request headers as `Name: Value`.
+  ([Environment variables](https://code.claude.com/docs/en/env-vars))
+- `--append-system-prompt` appends to the end of the default system prompt.
+  ([CLI reference](https://code.claude.com/docs/en/cli-reference#system-prompt-flags))
+- Caveat: Claude Code records the system prompt on a conversation's first request and
+  reuses it, so a per-run appended string is fixed for that conversation. This suits
+  one-shot runs.
+  ([same section](https://code.claude.com/docs/en/cli-reference#system-prompt-flags-in-resumed-conversations))
+
+Not demonstrated: none of this is demonstrable without paid API calls.

@@ -57,3 +57,15 @@ the package targets it.
 
 - Whether a user's configuration may import other packages, and where those resolve from
   in the nested `thunderjar/package.json` layout. Nothing needs it yet.
+
+## Verification
+
+- Demo: [verification/141-runnable-artifact](../scratchpad/verification/141-runnable-artifact/test.sh)
+  ([output](../scratchpad/verification/141-runnable-artifact/output.txt)). With no global
+  Bun, a package depending on an exact `bun` version, with a `#!/usr/bin/env bun` bin, ran
+  via `npx` and `npm run`, loaded a `.ts` config directly, and used the `bun` from
+  `node_modules/.bin`. Invoking `node_modules/.bin/thunderjar` directly (not through a
+  package manager) failed with `env: 'bun': No such file or directory`, as the page describes.
+- The npm `bun` package exposes `bin` entries `bun` and `bunx`
+  ([registry metadata](https://registry.npmjs.org/bun/latest)).
+- Not verified: that `thunderjar generate` or `_generated/` behave as described (design, not an external claim).

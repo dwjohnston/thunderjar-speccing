@@ -1,0 +1,28 @@
+git version 2.43.0
+--- dev status before
+ M f
+?? wip.txt
+--- restore: fetch into branch (image repo, HEAD)
+fetch ok
+--- Thunderjar commit built in image copy w/ temp index (image untouched)
+image status unchanged:
+ M f
+?? u.txt
+(commit object 382ae1bb698bc058517944265387223ed8301dfe not reachable by ref; need ref)
+--- dev after
+main
+ M f
+?? wip.txt
+Thunderjar | thunderjar: uncommitted changes at end of container-run-123
+agent | agent commit
+agent | base
+ f     | 1 +
+ u.txt | 1 +
+ 2 files changed, 2 insertions(+)
+--- second restore, same branch name, no force
+From <tmp>/image
+ ! [rejected]        HEAD       -> thunderjar/container-run-123  (non-fast-forward)
+exit=1
+--- outside a repo
+fatal: not a git repository (or any of the parent directories): .git
+exit=128

@@ -42,3 +42,9 @@ the single most common experiment shape.
 ## When it applies
 
 Build time only. Its fragment runs after the code state's and before the harness's.
+
+## Verification
+
+- `git checkout <commit> -- <path>` restores that path from the commit into the index and worktree, discarding uncommitted edits to it; `cp` then places it. Demonstrated in [scratchpad/verification/063-prompt-set/](../scratchpad/verification/063-prompt-set/test.sh) (output in `output.txt`). Docs: <https://git-scm.com/docs/git-checkout> (not fetchable from the sandbox; behaviour confirmed by the demo). The checkout leaves the file staged, so `git status` shows it as modified in the index.
+- Claude Code loads a root `CLAUDE.md`, `.claude/rules/*.md` and skills from the project: <https://code.claude.com/docs/en/memory>. If a `CLAUDE.md` exists, `AGENTS.md` is ignored by default (same page).
+- Not verified: the Dockerfile `RUN` fragment itself (design choice); `git` must be present in the build context with the pinned commit reachable.

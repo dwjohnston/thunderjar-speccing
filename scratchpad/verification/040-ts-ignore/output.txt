@@ -1,0 +1,6 @@
+Version 7.0.2
+--- without @ts-ignore
+bad.ts(1,7): error TS2322: Type 'string' is not assignable to type 'number'.
+exit=1
+--- with @ts-ignore
+exit=0

@@ -152,3 +152,19 @@ re-serialises it, is open below.
 - **Requiring a changeset.** Whether a pull request without one fails CI, or only warns.
 - **Commander confirmed?** Chosen on the strength of familiarity; nothing else in the spec
   depends on it.
+
+## Verification
+
+- **Demo** ([test.sh](../scratchpad/verification/140-bun-claims/test.sh),
+  [output.txt](../scratchpad/verification/140-bun-claims/output.txt), Bun 1.3.14): `bun:sqlite`
+  and `Bun.CryptoHasher` work with no install; `Bun.spawn` runs `git`; `bun run` executes
+  `.ts` without a build step and does not type-check; `bun build` emits only `index.js`, no
+  `.d.ts`; SHA-256 of `JSON.stringify` differs by key order, so canonicalisation is ours.
+- **Changesets action**: opens a "Version Packages" PR and publishes, and Node/npm setup is the
+  workflow's job ([changesets/action](https://github.com/changesets/action)). Its README lists
+  `publish-script` / `version-script` inputs; check input names against the version pinned.
+- **Unverified** (biomejs.dev and bun.com blocked by the sandbox proxy): `noRestrictedImports`
+  option shape and rule group, `useFilenamingConvention` options, `overrides[].includes`,
+  comments in `biome.json` (the spec itself says `biome.jsonc`), plugin `includes` scoping.
+  Also unchecked: `actions/upload-pages-artifact` / `deploy-pages`, VitePress script names,
+  Dependabot ecosystems.

@@ -1,0 +1,7 @@
+valid:   'prerun-3f9a2c'
+valid:   'postrun-3f9a2c-run1'
+valid:   'prerun-'
+invalid: '-bad'
+invalid: 'has space'
+invalid: 'prerun:x'
+single repo example refs: registry.example.com/thunderjar/images:prerun-3f9a2c and :postrun-3f9a2c-run1

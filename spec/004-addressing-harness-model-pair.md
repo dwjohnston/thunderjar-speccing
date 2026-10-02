@@ -156,3 +156,15 @@ Concepts, not a file list:
 - Anywhere the path notation reads `<harnesses>/<models>`, it becomes the pair.
 - The `scratchpad/harness-model-types` demo still shows the superseded cross-product
   option as chosen.
+
+## Verification
+
+- Claude Haiku 4.5 API ID is `claude-haiku-4-5-20251001` (alias `claude-haiku-4-5`):
+  [Models overview](https://platform.claude.com/docs/en/about-claude/models/overview). Verified.
+- Template-literal types over unions give a closed set of pair strings, and a pair outside
+  it is a type error: [demo](../scratchpad/verification/004-pair-union/test.sh)
+  ([output](../scratchpad/verification/004-pair-union/output.txt)). Verified by running `tsc`.
+- OpenCode's `anthropic/claude-haiku-4-5-20251001` provider-prefixed ID form: not verified
+  (opencode.ai was unreachable from the sandbox). Check the OpenCode models docs.
+- Not checked: that `claude-code@2.1.283`, `codex@0.9.0` and `gpt-luna` exist; they read as
+  illustrative values.

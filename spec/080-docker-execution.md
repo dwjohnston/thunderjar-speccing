@@ -105,3 +105,12 @@ the run. _(Referenced by: [085-experiment-results.md](085-experiment-results.md#
   fits in the Initial Setup sequence (part of the base image? its own step? applied to
   every prerun image regardless of permutation?) is unresolved. Revisit. (Also noted in
   [020-goals-non-goals.md](020-goals-non-goals.md#to-revisit).)
+
+## Verification
+
+Checked 2026-10; docs.docker.com was unreachable from the sandbox (egress proxy), so the Docker points below are from memory of the docs and should be re-checked.
+
+- **Wrapper logic** (timestamps, `$?` capture, valid JSON): run locally, see [scratchpad/verification/080-exec-wrapper/](../scratchpad/verification/080-exec-wrapper/test.sh) (`output.txt` alongside). No Docker daemon in the sandbox, so `docker commit` itself was not exercised.
+- **`date +%s%3N` is GNU-specific.** It works with GNU coreutils; BusyBox/Alpine `date` generally lacks `%N`, so the wrapper needs a coreutils-style `date` in the base image. Unverified here.
+- **`docker commit` preserves the container filesystem layer, not volume/bind-mount contents** ([docs](https://docs.docker.com/reference/cli/docker/container/commit/)), and pauses the container by default. `/thunderjar/run.json` and the harness result file must therefore live on the container filesystem, not a mounted volume. Unverified (docs blocked).
+- **Containers share the host kernel clock**: true for standard Linux containers (not for VM-backed Docker Desktop, where the clock is the VM's). Unverified.

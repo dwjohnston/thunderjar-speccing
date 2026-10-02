@@ -92,3 +92,13 @@ The CLI has two modes over the same underlying engine:
   of composable single-shot commands (e.g. `thunderjar show <execution-id>`).
 - What "promoting" a local run to canonical/CI status looks like, if that's a thing
   at all.
+
+## Verification
+
+- `// @ts-ignore` suppresses the type error on the following line, so a `@ts-ignore`
+  failure can be detected mechanically (e.g. by grepping the diff for it) while `tsc`
+  still exits 0. Per the
+  [TypeScript 3.9 release notes](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-9.html#-ts-expect-error-comments).
+  Demo: [scratchpad/verification/040-ts-ignore/](../scratchpad/verification/040-ts-ignore/test.sh)
+  (`tsc` exits 1 without the comment, 0 with it).
+- The rest of the page is design decisions; nothing else to verify.

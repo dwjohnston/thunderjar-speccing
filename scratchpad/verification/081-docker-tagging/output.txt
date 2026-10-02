@@ -1,0 +1,5 @@
+full ULID length: 26
+spec example execution ID '01k4x9j2e8mqz3' length: 14
+valid (16 chars, max 128): prerun-h4f9a21c8
+valid (37 chars, max 128): postrun-e01k4x9j2e8mqz3-h4f9a21c8-i00
+valid (49 chars, max 128): postrun-e01K4X9J2E8MQZ3ABCDEFGHJKMN-h4f9a21c8-i00

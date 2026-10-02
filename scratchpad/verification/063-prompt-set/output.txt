@@ -1,0 +1,4 @@
+== worktree before: worktree edit (uncommitted)
+== CLAUDE.md after pinned checkout: v1 prompt
+M  prompts/snerk.md
+?? CLAUDE.md
