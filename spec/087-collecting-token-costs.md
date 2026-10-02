@@ -219,10 +219,9 @@ an error.
 
 ## Open questions
 
-- **Exact field names in each harness's payload.** The Claude Code field names above are
-  described from the Agent SDK's documented shape; the CLI's `--output-format json`
-  payload has not been captured and diffed against it, and may use different casing. Do
-  that before implementing a collector.
+- **Exact field names in each harness's payload.** Claude Code's are now captured (see
+  Verification); Codex and Qwen field names are still to be captured and diffed before
+  implementing their collectors.
 - Whether the raw result file should *also* be stored verbatim in the run data store
   alongside the parsed numbers. It is a few KB of text, and without it re-collecting
   across a year of runs means pulling a year of images. It is explicitly not the OTel
@@ -230,3 +229,25 @@ an error.
   the same shape of idea.
 - Whether `notReported` should distinguish "harness reports no usage" from "harness
   reported zeros after a crash". They're recorded the same today.
+
+## Verification
+
+- **Claude Code `--output-format json`** carries `total_cost_usd`, `duration_api_ms`, flat
+  `usage` (snake_case) and `modelUsage` (camelCase, with `costUSD` and `costBasis`).
+  Captured from a real run (v2.1.287) in
+  [scratchpad/verification/087-claude-json-shape/](../scratchpad/verification/087-claude-json-shape/test.sh).
+  Docs: [headless](https://code.claude.com/docs/en/headless#get-structured-output),
+  [Agent SDK cost tracking](https://code.claude.com/docs/en/agent-sdk/cost-tracking).
+- **Flat `usage` excludes subagents; `modelUsage` and `total_cost_usd` include them**:
+  per the cost-tracking docs above. Not demonstrated (no subagent run).
+- **Cost is a client-side estimate** from a locally bundled price table;
+  `costBasis` is `list`, `managed` or `unknown` (needs v2.1.246+): same docs, and
+  [costs](https://code.claude.com/docs/en/costs).
+- **Codex**: `codex exec --json` emits a per-turn `turn.completed` event whose `usage` has
+  token counts and no cost field, per
+  [`exec_events.rs`](https://github.com/openai/codex/blob/main/codex-rs/exec/src/exec_events.rs).
+  That no roll-up summary exists was not checked. The Codex docs site was egress-blocked.
+- **Qwen**: [headless docs](https://github.com/QwenLM/qwen-code/blob/main/docs/users/features/headless.md)
+  confirm `--output-format json` with usage; its token field names are not checked.
+- **Unverified**: OpenCode's final event and its occasional omission; `codex exec --json`
+  as the documented invocation (only the source file was read).
