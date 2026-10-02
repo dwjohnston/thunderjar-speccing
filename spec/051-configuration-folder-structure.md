@@ -1,8 +1,8 @@
 # Configuration Folder Structure
 
-What Thunderjar configuration looks like inside a user's project. The shape of each
-declaration is in [060-experiment-parameters.md](060-experiment-parameters.md); this page
-is about where things live.
+Where Thunderjar configuration lives inside a user's project. What goes in each file is
+elsewhere: experiments in [055-declaring-experiments.md](055-declaring-experiments.md),
+parameters in [060-experiment-parameters.md](060-experiment-parameters.md).
 
 ## Example project
 
@@ -13,6 +13,8 @@ my-app/
 │   ├── snerk.md                           # prompt files — what prompt sets check out
 │   └── glurk.md
 └── thunderjar/
+    ├── package.json                       # only for non-JS projects; created by `init`
+    ├── .gitignore                         # created by `init`: _generated/, .data/ (+ node_modules/ if nested)
     ├── thunderjar.config.ts               # global config: stores, registry, test runner
     ├── experiments/
     │   └── is-prime-baseline.ts           # declareExperiment(...)
@@ -25,7 +27,7 @@ my-app/
     │   │   │   └── index.ts               # declareCodeState(...)
     │   │   └── with-fixture/
     │   │       ├── index.ts
-    │   │       └── seed-fixture-data.sh   # bundled — part of the content hash
+    │   │       └── seed-fixture-data.sh   # bundled — part of the parameter hash
     │   ├── promptSets/
     │   │   ├── snerk/
     │   │   │   └── index.ts               # declarePromptSet(...)
@@ -39,7 +41,9 @@ my-app/
     │   │       └── index.ts               # declareModel(...)
     │   └── tasks/
     │       └── is-prime/
-    │           ├── index.ts               # declareTask(...) — the task: the initial prompt. Hashed.
+    │           ├── initial-prompts/
+    │           │   ├── plain.ts           # declareInitialPrompt(...). Hashed.
+    │           │   └── terse.ts
     │           └── measurements/          # NOT hashed
     │               ├── isPrimeTsExists.ts
     │               ├── isPrimeTestExists.ts
@@ -56,78 +60,26 @@ my-app/
   rather than copying them into `thunderjar/`.
 - **One folder per parameter**, under `experiment-parameters/<kind>/<name>/`. The folder
   name is the parameter's name; its content — `index.ts` plus anything bundled — is its
-  content hash.
-- **A task folder holds the task and its measurements.** `index.ts` is the task — the
-  initial prompt, and the experiment parameter. `measurements/` holds the task
-  measurements associated with it. They live together because measurements are
-  meaningless apart from their task, but `measurements/` is **excluded from the task's
-  content hash**: measurements don't affect
-  the prerun or postrun image, so changing them must not change the parameter hash.
+  parameter hash.
+- **A task folder holds the task's initial prompts and its measurements.** The folder
+  name is the task. `initial-prompts/` has one file per wording, and each is an
+  experiment parameter value, hashed on its own. `measurements/` holds the task
+  measurements, shared by every initial prompt of the task. They live together because
+  measurements are meaningless apart from their task, but `measurements/` is **excluded
+  from every parameter hash**: measurements don't affect the prerun or postrun image, so
+  changing them must not change the permutation hash.
 - **One file per measurement, named by its file.** `isPrimeTsExists.ts` is the
   measurement `isPrimeTsExists`. Supporting files, like a `templateTest` template, sit
   alongside.
 - **Experiments live outside `experiment-parameters/`.** An experiment isn't a parameter;
   it's a matrix over them.
-
-## Declaring
-
-Every configuration file default-exports the result of a `declareX()` call rather than a
-bare object. The function carries the type, so the file is checked without `satisfies`,
-`as`, or a type annotation.
-
-```ts
-// thunderjar/experiments/is-prime-baseline.ts
-export default declareExperiment({
-  baseImage: ["node20"],
-  codeState: ["baseline"],
-  promptSet: ["snerk", "glurk"],
-  harness: ["claude-code-2-1-283"],
-  model: ["haiku-4-5"],
-  task: ["is-prime"],
-  iterations: 5,
-});
-```
-
-```ts
-// thunderjar/experiment-parameters/tasks/is-prime/index.ts
-export default declareTask({
-  prompt: "Create a file isPrime.ts exporting a function that tests for primality.",
-  applyParameter: () => ``,
-});
-```
-
-```ts
-// thunderjar/experiment-parameters/tasks/is-prime/measurements/isPrimeTemplateTest.ts
-export default declareMeasurement({
-  instrument: "templateTest",
-  config: {
-    subject: "**/isPrime.ts",
-    template: "./isPrime.test.template.ts",
-  },
-});
-```
-
-The experiment declares tasks, not measurements. Measurements come with the task, so a
-second experiment using `is-prime` gets the same measurements without copying them.
-
-## Typed names
-
-The strings in `declareExperiment` are not free text. A generation step reads the
-folder names under `experiment-parameters/` and emits their union types into
-`_generated/parameter-names.d.ts`, so a misspelled or deleted parameter is a type error
-in the experiment file. The folder is git-ignored — see
-[022-coding-conventions.md](022-coding-conventions.md#generated-files-go-in-_generated-and-are-git-ignored).
-
-```ts
-// _generated/parameter-names.d.ts — generated, not edited
-type PromptSetName = "snerk" | "glurk";
-type TaskName = "is-prime";
-// …one union per parameter kind
-```
+- **Generated types live in `_generated/`.** They are built from the folder names above
+  and git-ignored — see
+  [055-declaring-experiments.md](055-declaring-experiments.md#typed-names).
 
 ## Open questions
 
-- When the generation step runs — on demand, in a watch mode, or as part of every
-  Thunderjar command.
-- Whether `thunderjar/` is a fixed location or configurable.
-- What else `thunderjar.config.ts` holds beyond stores, registry and test runner.
+- What else `thunderjar.config.ts` holds beyond the stores and test runner.
+
+`thunderjar/` is a fixed location, found by walking up from the current directory. See
+[050-setup-and-configure.md](050-setup-and-configure.md#install-and-init).

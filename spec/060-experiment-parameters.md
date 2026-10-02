@@ -1,7 +1,8 @@
 # Experiment Parameters
 
-Parameter hashing and identity, plus the detailed configuration reference for
-harnesses, prompt sets, tasks, and measuring instruments. Builds on the six
+Parameter hashing and identity, what every declaration has in common, and an
+example of each parameter's declaration. Each parameter's detail is on its own page,
+061 to 066. Also covers measuring instruments. Builds on the six
 [experiment parameters](030-terminology.md#experiment-parameters) already named
 in the glossary.
 
@@ -9,17 +10,89 @@ in the glossary.
 
 - Every experiment parameter folder (`experiment-parameters/<kind>/<name>/`)
   hashes its full content — `index.ts` plus any bundled scripts, templates, or
-  fixtures — to a **content hash**. The same mechanism applies to measurements
-  too, even though they aren't experiment parameters: hashing them catches
+  fixtures — to a **parameter hash**. Measurements are hashed the same way, to a
+  *content hash*, even though they aren't experiment parameters: hashing them catches
   silent drift when a named definition's content changes underneath it.
-- A permutation's **parameter hash** combines the content hashes of its six
+- A permutation's **permutation hash** combines the parameter hashes of its six
   resolved experiment parameters (base image, code state, prompt set, harness,
-  model, task). Two container runs are only directly comparable if
-  their parameter hashes match.
-- Content hash is derived from content, not name — renaming a folder doesn't
+  model, initial prompt), plus the model ID the harness resolves the model to (see
+  [064-harness.md](064-harness.md#hashing)). Two container runs are only directly comparable if
+  their permutation hashes match.
+- A harness's `models` map is excluded from its parameter hash. Adding a model
+  to a harness doesn't change any existing permutation hash; changing one
+  model's ID changes only that model's permutations, through the resolved
+  model ID.
+- A declaration can add to, or replace, what its parameter hash is derived from — see
+  [Controlling the parameter hash](#controlling-the-parameter-hash).
+- Parameter hash is derived from content, not name — renaming a folder doesn't
   break comparability, but editing `index.ts` does. Any report comparing "the
   same" named parameter over time should treat a hash change as a break, not
   silently merge pre/post-edit runs together.
+
+## Controlling the parameter hash
+
+By default a parameter hash comes from its folder's content. A declaration
+can change that with one of two optional functions. Each returns a shell command.
+Thunderjar runs the command on the host at the start of each experiment execution, and
+uses its output.
+
+```ts
+additionalHash?: () => string; // a command; its output is hashed with the folder's content
+determineHash?: () => string;  // a command; its output is hashed instead of the folder's content
+```
+
+| Function | Parameter hash is derived from |
+|---|---|
+| Neither | The folder's content. |
+| `additionalHash` | The folder's content, plus the command's output. |
+| `determineHash` | The command's output only. The folder's content is ignored. |
+| Both | As `determineHash`. |
+
+If a declaration provides both, `determineHash` takes precedence and `additionalHash`
+is ignored.
+
+```ts
+// experiment-parameters/codeStates/main/index.ts
+export default declareCodeState({
+  determineHash: () => `git rev-parse main`,
+  applyParameter: (ctx) => `RUN git checkout ${ctx.resolvedHash}`,
+});
+```
+
+```ts
+// experiment-parameters/baseImages/node20/index.ts
+export default declareBaseImage({
+  additionalHash: () => `docker image inspect --format '{{.Id}}' node:20-bookworm`,
+  applyParameter: () => `FROM node:20-bookworm`,
+});
+```
+
+### `ctx.resolvedHash`
+
+The command's output is passed to `applyParameter` as `ctx.resolvedHash`. For the code
+state above, on an execution where `main` is at `a1b2c3`:
+
+```
+git rev-parse main        → a1b2c3
+ctx.resolvedHash          = "a1b2c3"
+applyParameter returns    RUN git checkout a1b2c3
+```
+
+Use it in the fragment. A fragment of `RUN git checkout main` has the same text on
+every execution, so Docker would reuse the layer it built from an earlier commit. With
+the resolved value in the fragment, the image is built from exactly what was hashed.
+
+### Parameters that follow a moving target
+
+The code state above means "whatever `main` is when the experiment executes". Each
+execution resolves it again. When `main` has moved, the parameter hash is different, so
+the permutation hash is different, and the execution is recorded as a different
+permutation of the same named parameters.
+
+This is sometimes called a *floating parameter*. It is not a separate kind of parameter
+and Thunderjar has no special handling for it: it is a declaration that uses
+`determineHash`. Any parameter can do it — a prompt set following a branch, a harness
+following its latest release.
 
 ## Declarations and `applyParameter`
 
@@ -30,8 +103,12 @@ the `index.ts` in its folder, whose default export is wrapped in that kind's
 Every declaration exposes the same function:
 
 ```ts
-applyParameter: () => string; // a Dockerfile fragment
+applyParameter: (ctx) => string; // a Dockerfile fragment
 ```
+
+`ctx` carries `resolvedHash` — see
+[Controlling the parameter hash](#ctxresolvedhash). A declaration that doesn't need it
+leaves the argument off.
 
 Building a permutation's prerun image is then a fold: concatenate each
 parameter's fragment, in the order below, and build the result.
@@ -62,8 +139,8 @@ the harness is invoked, and their `applyParameter` returns an empty string:
 | Code state | checkout / fixture generation | — |
 | Prompt set | overlays prompt files | — |
 | Harness | installs the agent tool | invoked via `cli` |
-| Model | — | `ctx.model` |
-| Task | — | `ctx.taskPrompt` |
+| Model | — | `ctx.modelId` |
+| Initial prompt | — | `ctx.initialPrompt` |
 
 This split is the same one the flowchart in
 [080-docker-execution.md](080-docker-execution.md#process) draws as its
@@ -73,10 +150,8 @@ build-time setup later without changing the system's shape.
 
 ## Base image
 
-The image a permutation's prerun image is built `FROM`, before code state is
-applied — base OS/runtime plus any extra services a task needs (a database, a
-message broker) that code state, prompt set, or harness don't provision
-themselves.
+The image a permutation's prerun image is built `FROM`. Detail:
+[061-base-image.md](061-base-image.md).
 
 ```ts
 // experiment-parameters/baseImages/node20/index.ts
@@ -85,39 +160,22 @@ export default declareBaseImage({
 });
 ```
 
-Most experiments just use one plain, minimal base image like the one above;
-this parameter only needs attention when a task genuinely depends on something
-the codebase itself doesn't set up.
-
 ## Code state
 
-The codebase applied on top of the base image. Most commonly a pinned git
-commit, but `applyParameter` can return any fragment that produces the same
-codebase every time — applying a patch, running a fixture generator, and so on
-aren't special cases.
+The codebase applied on top of the base image, most commonly a pinned git commit.
+Detail: [062-code-state.md](062-code-state.md).
 
 ```ts
 // experiment-parameters/codeStates/baseline/index.ts
 export default declareCodeState({
   applyParameter: () => `RUN git checkout a1b2c3`,
 });
-
-// experiment-parameters/codeStates/with-fixture/index.ts
-export default declareCodeState({
-  applyParameter: () =>
-    `RUN git checkout a1b2c3 && ./scripts/seed-fixture-data.sh`,
-});
 ```
 
 ## Prompt set
 
-A named, reusable action that overlays prompt files (`CLAUDE.md`, skills,
-rules) into the worktree before the harness runs.
-
-Prompt files are checked out from a pinned commit, not taken from whatever
-happens to be in the worktree. Otherwise the declaration's content hash stays
-the same while the file it applies changes underneath it — precisely the silent
-drift the hash exists to catch.
+A named, reusable action that overlays prompt files (`CLAUDE.md`, skills, rules) into
+the worktree before the harness runs. Detail: [063-prompt-set.md](063-prompt-set.md).
 
 ```ts
 // experiment-parameters/promptSets/snerk/index.ts
@@ -129,19 +187,14 @@ export default declarePromptSet({
 });
 ```
 
-The commit is the prompt set's own, independent of the code state's. That
-keeps the two axes orthogonal: a matrix can vary prompt sets while holding
-code state fixed, which is the single most common experiment shape.
-
 ## Harness
 
-A named, version-pinned definition of an agent tool. The harness is the only
-parameter involved in all three phases of a container run — it is installed
-into the image, invoked to do the work, and read back afterwards for what the
-run cost.
+A named, version-pinned definition of an agent tool. It is installed into the image,
+invoked to do the work, and read back afterwards for what the run cost. Detail:
+[064-harness.md](064-harness.md).
 
 ```ts
-// experiment-parameters/harnesses/claude-code/index.ts
+// experiment-parameters/harnesses/claude-code-2-1-283/index.ts
 const version = "2.1.283";
 
 export default declareHarness({
@@ -153,67 +206,46 @@ export default declareHarness({
 
   // run: execute the agent, and write the result file
   cli: (ctx) =>
-    `claude -p "${ctx.taskPrompt}" --model ${ctx.model} ` +
+    `claude -p "${ctx.initialPrompt}" --model ${ctx.modelId} ` +
     `--allowedTools "Write,Edit,Read,Bash" --output-format json > ${ctx.resultPath}`,
 
   // interpret: turn that file's contents into normalised token costs
   collectTokenCosts: (raw) => { /* … */ },
+
+  // which models this harness runs, and the ID it passes for each
+  models: {
+    "sonnet-5-5": "claude-sonnet-5-5",
+    "haiku-4-5": "claude-haiku-4-5-20251001",
+  },
 });
 ```
-
-`cli` carries a contract worth stating plainly: **the command it returns must
-both run the agent and leave a file at `ctx.resultPath`.** Thunderjar supplies
-the path and never parses the file itself — it hands the bytes to that same
-harness's `collectTokenCosts`. Thunderjar also wraps the command to record start time,
-finish time and exit code — the harness author does nothing for that; see
-[080-docker-execution.md](080-docker-execution.md#the-execution-wrapper). See
-[087-collecting-token-costs.md](087-collecting-token-costs.md) for the
-`TokenCosts` contract and what happens when the file is missing or malformed.
-
-Comparing two versions of the same tool (e.g. Claude Code v1 vs v2) is just
-comparing two harness declarations with different pinned versions — not a
-special case. This is why harness stays separate from base image rather than
-being folded into it. Where the pre-built harness images come from is
-unresolved — see
-[020-goals-non-goals.md](020-goals-non-goals.md#to-revisit). A declaration is
-free to `RUN npm install` instead.
 
 ## Model
 
-The root LLM the harness is invoked with. Nothing to add to the image.
+The root LLM the harness is invoked with. The folder name is its identity; the ID
+passed on the command line belongs to each harness. Detail:
+[065-model.md](065-model.md).
 
 ```ts
-// experiment-parameters/models/haiku/index.ts
+// experiment-parameters/models/haiku-4-5/index.ts
 export default declareModel({
-  model: "claude-haiku-4-5-20251001",
   applyParameter: () => ``,
 });
 ```
 
-Sub-agent models aren't controlled here — they're recorded as outcomes, in the
-per-model breakdown of
-[087-collecting-token-costs.md](087-collecting-token-costs.md).
+## Initial prompt
 
-## Task
-
-The initial prompt given to the harness — what the agent is asked to do. It lives
-at `experiment-parameters/tasks/<name>/index.ts` and is hashed like any other
-experiment parameter.
+The first prompt given to the harness — what the agent is asked to do. It is one wording
+of a task, and the task's measurements live in a `measurements/` folder beside its
+initial prompts, excluded from every parameter hash. Detail: [066-task.md](066-task.md).
 
 ```ts
-// experiment-parameters/tasks/add-prime/index.ts
-export default declareTask({
-  prompt: "Write a TypeScript function that determines if a number is prime.",
+// experiment-parameters/tasks/is-prime/initial-prompts/plain.ts
+export default declareInitialPrompt({
+  prompt: "Create a file isPrime.ts exporting a function that tests for primality.",
   applyParameter: () => ``,
 });
 ```
-
-Associated with each task are its **task measurements**, in a `measurements/`
-folder beside it. They live with the task because they're only meaningful for
-it, but that folder is **excluded from the task's content hash** — per
-[terminology](030-terminology.md#experiments), they judge the outcome, they
-don't determine what runs. See
-[051-configuration-folder-structure.md](051-configuration-folder-structure.md).
 
 ## Measuring instruments & measurements
 
@@ -288,24 +320,14 @@ pinned runtime and installed dependencies. Its value type is a count rather
 than a boolean — a measurement, not a verdict. The glob matching nothing gives
 `skipped`; a template that can't bind gives `erroredWhileMeasuring`.
 
-## Accepted tradeoffs
-
-- **`collectTokenCosts` is part of the harness's content hash, though it doesn't
-  determine what runs.** Strictly it belongs with measurements — it interprets a
-  run after the fact. Because the whole declaration folder is hashed, correcting
-  a parser bug changes the harness's content hash, and so the parameter hash,
-  marking old runs as not directly comparable even though nothing about what
-  executed changed. Accepted for now: keeping the harness's three phases in one
-  declaration is worth more than the hash precision, and a hash change is a
-  warning rather than an error. Token costs stay re-derivable regardless, since
-  the raw result file is preserved in the postrun image.
-
 ## Open questions
 
 - Hash algorithm, and exactly what gets hashed (file contents only, or also
   file paths/structure?).
-- Whether `applyParameter` should receive any context, or stay zero-argument as
-  above.
+- What happens when an `additionalHash` or `determineHash` command exits non-zero.
+- Whether the command's output is stored alongside the hash, so a report can show the
+  commit an execution resolved to rather than only its hash.
+- What else `applyParameter`'s `ctx` carries, beyond `resolvedHash`.
 - Nothing stops a declaration returning a fragment that isn't reproducible
   (`RUN apt-get install foo`). The prerun image being built once and reused
   bounds the damage within a permutation's lifetime, but the hash can't detect

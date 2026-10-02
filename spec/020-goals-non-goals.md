@@ -4,7 +4,7 @@ What's in scope vs. explicitly not.
 
 ## Non-goals (v1)
 
-- **Retention/purge policy for preserved containers and metadata.** No TTLs, no
+- **Retention/purge policy for preserved images and metadata.** No TTLs, no
   differentiated retention by pass/fail, no pruning. Assume everything is kept
   indefinitely for now; revisit once storage cost or volume actually becomes a
   problem. (Touches [080-docker-execution.md](080-docker-execution.md) and
@@ -21,6 +21,28 @@ What's in scope vs. explicitly not.
   measurement chooses its own (see
   [085-experiment-results.md](085-experiment-results.md#how-a-measures-values-combine)).
   Most likely to return as a default that a measurement's own choice overrides.
+
+- **Skills that run or iterate experiments.** The shipped skill only helps capture a
+  test case and write its measurements; running, rerunning and comparing stays in the
+  CLI. (See [045-shipped-skills.md](045-shipped-skills.md).)
+
+- **Interactive mode / TUI.** The first pass ships scriptable, one-shot commands only.
+  Browsing past runs, drilling into an iteration and the report visualization as an
+  interactive view are deferred. Everything an interactive mode would do must remain
+  reachable through a scriptable command, so it can be added later as a thin layer over
+  the same engine. (See [040-user-experience.md](040-user-experience.md#cli-shape),
+  [100-cli-reference.md](100-cli-reference.md) and
+  [110-cli-report-visualization.md](110-cli-report-visualization.md).)
+
+- **Runtime validation of configuration and harness output.** A schema library (such as
+  Zod) checking `declareX()` objects, the harness's result file and stored records. In v1
+  configuration is TypeScript, checked by the type system. (See
+  [140-tooling.md](140-tooling.md).)
+
+- **Concurrent container runs.** v1 runs container runs one at a time, with no concurrency
+  setting and so no need for a concurrency-limiting library. Parallel runs would also bring
+  in the prompt cache question under "To revisit". (See
+  [050-setup-and-configure.md](050-setup-and-configure.md#thunderjarconfigts).)
 
 ## To revisit
 

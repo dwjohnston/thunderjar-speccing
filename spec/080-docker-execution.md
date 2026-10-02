@@ -14,7 +14,7 @@ flowchart TD
     B --> C
 
     subgraph PERM["Per permutation"]
-        C{"Prerun image exists<br/>for this permutation's<br/>parameter hash?"}
+        C{"Prerun image exists<br/>for this permutation's<br/>permutation hash?"}
         C -- Yes --> D["Pull existing prerun image"]
         C -- No --> E["Start FROM base image<br/>(experiment parameter)"]
         E --> F["Apply code state<br/>(usually a pinned commit)"]
@@ -27,7 +27,7 @@ flowchart TD
 
     subgraph ITER["Per iteration"]
         K["Run a new container<br/>from the prerun image"]
-        K --> L["Execution: harness invoked headlessly<br/>with task + model, inside<br/>Thunderjar's execution wrapper"]
+        K --> L["Execution: harness invoked headlessly<br/>with initial prompt + model, inside<br/>Thunderjar's execution wrapper"]
         L --> M["docker commit the container<br/>into a postrun image"]
         M --> N["Tag as postrun image,<br/>push to image store"]
         N --> O["Measurement: start a short-lived measurement<br/>container from the postrun image, apply the<br/>task's measurements, then discard it"]
@@ -95,7 +95,7 @@ What this times is the agent's execution only: harness start to exit. Image pull
 container setup and measurement are not part of it — measurement happens after commit,
 and its duration changes every time measurements are backfilled, so it isn't a fact about
 the run. _(Referenced by: [085-experiment-results.md](085-experiment-results.md#execution),
-[060-experiment-parameters.md](060-experiment-parameters.md#harness).)_
+[064-harness.md](064-harness.md).)_
 
 ## Open questions
 

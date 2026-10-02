@@ -55,9 +55,23 @@ the final one. Search the earlier aliases too — most of the conversation preda
 | prompt cache isolation | `DISABLE_PROMPT_CACHING`, `prompt-cache-key` (⚠️ see correction below) | 03:47–83 |
 | **experiment parameter definition** | "artifact", "jar definition", "run definition" (all 12, rejected) | 12:41–83 |
 | test-suite measurement | "unit test measurer", "importAndRun", `testRunner: 'bun test'` (config field) | 09:76 (config), 10:112–122, 10:154 |
+| **test boundaries** (spec file `test-boundaries.md`, now `spec/120-test-boundaries.md`) | "testing strategy", `testing-strategy.md` (13:142, 13:177; renamed by David at 15:64), "testing boundaries" (David, 08:41), "testing this application" (08:7) | 08, 13:142–177, 15:7–93 |
+| **recording adapter** | "dry-run adapter" (15:11), "print the Docker commands" / "assert on standard out" (David, 15:7), "a fake ... container that echoes a canned result object" (agent, 08:15), "dependency-inject anything non-deterministic" | 08:15, 15:7–17 |
+| **fake harness** | "fake agent that is just a script" (David, 08:29), `node fake-agent.js` (08:37), "fake path" (08:49) | 08:29–39, 15:7, 15:19–23 |
+| **artifact assertions** | "Layer 2.5", "image as the unit under test", "assertion-on-Docker-metadata layer" (08:51), "assertions on the docker image" (David, 15:41) | 08:45–51, 15:39–62 |
+| **lifecycle tests** | "restore and purge", "prune" (08:47–53; later "purge"), "Layer 3" (15:25) | 08:47–53, 15:7, 15:25–28 |
+| **real-harness smoke test** | "one gap remains" (15:34–35) | 15:34–35, 15:74 |
+| layer numbering | 15:11–28 numbers CLI=1, Docker+fake harness=2, lifecycle=3, artifact=2.5, units unnumbered; 15:68–72 renumbers to 1 units, 2 CLI, 3 Docker, 4 artifact, 5 lifecycle (and still says "four layers" at 15:66 while listing five) | 15 |
 
 ## Not present in the conversation (checked, no hits)
 
+- **"Correctness test" as a term.** Grepped `correctness` across all parts — zero hits. The
+  conversation speaks only of measurements / measuring instruments / "unit test measurer".
+- For Thunderjar's own tests: no test runner or directory layout, no coverage targets, no
+  statement of which layers block CI (only that the smoke test is non-blocking and the
+  Docker layer is "tagged" out of the fast loop), no fixture-image storage decision, no
+  explicit "test via public interface, not internals" statement, no tests for backfill,
+  OTel/trace extraction, or hash-mismatch warnings.
 - **LLM-judge / LLM-as-a-judge / rubric / grader / semantic scoring measurements.** Grepped
   for `judge`, `rubric`, `grader`, `LLM.?as.?a.?judge`, `semantic`, `eval model`, `second
   model` across all 16 files — zero hits. The conversation never proposes using a model to
@@ -92,6 +106,33 @@ the final one. Search the earlier aliases too — most of the conversation preda
   measuring instruments, then the metadata report"; instruments as "pure functions over
   fixture directories"; `docker run --rm <image> …` vs exporting the filesystem.
 
+### Testing Thunderjar itself (test boundaries)
+- `13-spec-structure-and-workflows.md:142, 177` — agent proposes a "testing strategy for
+  Thunderjar itself" page, "separate from how the tool tests prompts"; David accepts
+  ("Everything else yes", 13:160).
+- `08-testing-thunderjar...:7–19` — first pass. Agent's three-way split: pure-ish unit
+  tests / DI'd orchestration with a fake runtime / a handful of real-Docker integration tests.
+- `08:29–39` — David's fake harness idea ("one of the harnesses be a fake harness"); agent:
+  same harness-config mechanism, edge-case fake scripts (never commits, malformed JSON, timeout).
+- `08:41–53` — David names "testing boundaries"; run, then search images, check tags,
+  inspect image, assert on deterministic file changes; prune scenario; registry upload
+  ("doesn't worry me too much").
+- `08:59–71` — David wants the real CLI experience during development; rejects the idea that
+  the interactive/TUI mode needs its own testing strategy ("testable both ways" with sensible DI).
+- `15:7` — David's canonical statement: DI anything non-deterministic incl. Docker, print
+  Docker commands, assert on stdout; real Docker + fake harness up to the metadata report;
+  restore from an existing image and expect branches/files.
+- `15:9–35` — agent's breakdown (recording adapters, same interface not a `--dry-run` path,
+  normalise volatile output, view-model split, contract check on the fake harness, purge
+  idempotency, throwaway local registry, golden-value hashing, non-blocking smoke test).
+- `15:39–62` — David adds the artifact layer; agent expands (tag, git state, files, labels,
+  base digest; inspection helper; `docker run --rm` vs export).
+- `15:64–93` — David names the file `test-boundaries.md`; agent's final five-item list.
+- Related, about testing *prompts* not Thunderjar: 09:174–178 (instrument authoring as TDD
+  against a restored fixture), 12:161–167 (measurements are not pass/fail), 06:51–55 (fake
+  MCP as DI for the workflow under test; out of scope per 11), 09:11–19 + 11:58–61 (infra
+  flakiness vs measurement failure deferred, folded into `erroredWhileMeasuring`).
+
 ### Token costs and timing
 - `01-telemetry-and-otel.md:17, 43, 83` — token cost named as a core goal; native OTel
   tracing gives nested interaction/tool/LLM-request spans with token usage.
@@ -120,6 +161,7 @@ the final one. Search the earlier aliases too — most of the conversation preda
 |---|---|---|
 | 2026-09-29 | How/when measuring instruments are applied to a container run (inside vs outside, before vs after commit, instrument shape, backfill, built-ins, LLM-judge, skipped/errored outcomes) | 06, 09, 10, 11, 12, 15 |
 | 2026-09-29 | How token counts/cost are collected for a container run (OTel vs `--output-format json` vs transcript; which fields; sub-agents; dollars; per-harness; duration) | 01, 02, 03, 04, 05, 07, 08, 13 |
+| 2026-10-01 | David's ideas on test boundaries for Thunderjar itself (layers, mock/real boundary, fake harness, artifact assertions, lifecycle, smoke test, open questions) | 08, 15, plus targeted lines of 06, 09, 10, 11, 12, 13 |
 
 ## Notes for future queries
 
@@ -128,7 +170,10 @@ the final one. Search the earlier aliases too — most of the conversation preda
 - `docs/conversation_json.md` is the unsplit source; each part file names its source line
   range in its header. Prefer the split files.
 - Line numbers cited in this index are 1-indexed lines of the split part files as of
-  2026-09-29.
+  2026-09-29 (re-checked 2026-10-01).
+- Part 08 is voice-transcribed with garbled audio and cut-off agent turns (08:41–61); the
+  prune test description is truncated mid-sentence at 08:53. `../conversation/README.md`
+  refers to the spec file as `spec/12-test-boundaries.md`; it is now `spec/120-test-boundaries.md`.
 
 ## Corrections — claims in the conversation that are factually wrong
 

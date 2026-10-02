@@ -15,7 +15,7 @@ assertion (`as`), or a type annotation (`const harness: Harness = …`).
 export default declareHarness({
   version: "2.1.283",
   applyParameter: () => `RUN npm install -g @anthropic-ai/claude-code@2.1.283`,
-  cli: (ctx) => `claude -p "${ctx.taskPrompt}" > ${ctx.resultPath}`,
+  cli: (ctx) => `claude -p "${ctx.initialPrompt}" > ${ctx.resultPath}`,
   collectTokenCosts: (raw) => { /* … */ },
 });
 ```
@@ -52,7 +52,7 @@ One function per kind:
 | Prompt set | `declarePromptSet` |
 | Harness | `declareHarness` |
 | Model | `declareModel` |
-| Task | `declareTask` |
+| Initial prompt | `declareInitialPrompt` |
 | Measurement | `declareMeasurement` |
 | Experiment | `declareExperiment` |
 
@@ -63,7 +63,7 @@ their files are Thunderjar configuration all the same, so the same rule applies.
 ## Generated files go in `_generated/`, and are git-ignored
 
 Anything Thunderjar generates — such as the parameter-name types described in
-[051-configuration-folder-structure.md](051-configuration-folder-structure.md#typed-names)
+[055-declaring-experiments.md](055-declaring-experiments.md#typed-names)
 — is written to a `_generated/` folder, never edited by hand, and never committed.
 
 ```
