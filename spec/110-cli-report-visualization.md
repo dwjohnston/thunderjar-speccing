@@ -11,8 +11,12 @@ All examples use one running scenario:
 - Task `is-prime`, with the three measurements from
   [085-experiment-results.md](085-experiment-results.md#how-a-measures-values-combine):
   `isPrimeTsExists` (`rate`), `tsIgnoreCount` (`mean`, `max`) and `isPrimeTemplateTest` (`sum`).
-- Experiment `is-prime-baseline`: a matrix of two models (`haiku`, `sonnet`) with every other
+- Experiment `is-prime-baseline`: two harness/model pairs
+  (`claude-code@2.1.283/haiku-4-5`, `claude-code@2.1.283/sonnet-5-5`) with every other
   parameter fixed, so two permutations, five iterations each, ten container runs.
+  Pair names and their generated types follow
+  [064-harness.md](064-harness.md#addressing-a-pair) and
+  [055-declaring-experiments.md](055-declaring-experiments.md#typed-pairs).
 
 ## `init`
 
@@ -21,16 +25,14 @@ $ thunderjar init
 Created thunderjar/
   experiments/
   experiment-parameters/
-    base-image/
-    code-state/
-    prompt-set/
-    harness/
-    model/
-    initial-prompt/
-  tasks/
+    baseImages/
+    codeStates/
+    promptSets/
+    harnessModels/
+    tasks/
   _generated/
 
-Next: add an experiment, then run `thunderjar plan <experiment>`.
+Next: run `thunderjar plan is-prime-baseline` for the example experiment.
 ```
 
 ## `generate`
@@ -38,12 +40,11 @@ Next: add an experiment, then run `thunderjar plan <experiment>`.
 ```
 $ thunderjar generate
 Read experiment-parameters/
-  base-image      1 name
-  code-state      1 name
-  prompt-set      1 name
-  harness         1 name
-  model           2 names
-  initial-prompt  1 name
+  baseImages      1 name
+  codeStates      1 name
+  promptSets      1 name
+  harnessModels   1 family, 1 version, 2 models -> 2 pairs
+  tasks           1 task, 1 initial prompt
 Wrote thunderjar/_generated/parameter-names.d.ts
 ```
 
@@ -58,15 +59,14 @@ Matrix
   baseImage      node20
   codeState      baseline
   promptSet      snerk
-  harness        claude-code
-  model          haiku | sonnet
+  harnessModel   claude-code@2.1.283/haiku-4-5 | claude-code@2.1.283/sonnet-5-5
   initialPrompt  plain
   iterations     5
 
 Permutations (2)
-  #  hash      model   prerun image
-  1  4f9a21c8  haiku   exists, will reuse
-  2  9be07d35  sonnet  not found, will build
+  #  hash      harnessModel                       prerun image
+  1  4f9a21c8  claude-code@2.1.283/haiku-4-5        exists, will reuse
+  2  9be07d35  claude-code@2.1.283/sonnet-5-5       not found, will build
 
 Container runs: 10  (2 permutations x 5 iterations)
 Prerun images:  1 to reuse, 1 to build
@@ -87,7 +87,7 @@ hash is explained:
 $ thunderjar run is-prime-baseline
 Execution 01K4X9J2E8MQZ3V7R5T0WABCDE  (is-prime-baseline)
 
-Permutation 1/2  4f9a21c8  model=haiku
+Permutation 1/2  4f9a21c8  harnessModel=claude-code@2.1.283/haiku-4-5
   prerun image   reused
   i00  done   0:42   $0.021   measured 3/3
   i01  done   0:38   $0.019   measured 3/3
@@ -95,7 +95,7 @@ Permutation 1/2  4f9a21c8  model=haiku
   i03  done   0:51   $0.027   measured 2/3  (1 skipped)
   i04  done   0:40   $0.020   measured 3/3
 
-Permutation 2/2  9be07d35  model=sonnet
+Permutation 2/2  9be07d35  harnessModel=claude-code@2.1.283/sonnet-5-5
   prerun image   built (1:12)
   i00  done   1:03   $0.118   measured 3/3
   i01  done   0:58   $0.109   measured 3/3
@@ -162,7 +162,7 @@ Date        2026-09-29 14:30
 
 Permutation 4f9a21c8  (5 iterations)
   baseImage node20 | codeState baseline | promptSet snerk
-  harness claude-code | model haiku | initialPrompt plain
+  harnessModel claude-code@2.1.283/haiku-4-5 | initialPrompt plain
 
   MEASURE              MEASURED  AGGREGATE
   isPrimeTsExists      5/5       rate 0.80
@@ -175,7 +175,7 @@ Permutation 4f9a21c8  (5 iterations)
 
 Permutation 9be07d35  (5 iterations)
   baseImage node20 | codeState baseline | promptSet snerk
-  harness claude-code | model sonnet | initialPrompt plain
+  harnessModel claude-code@2.1.283/sonnet-5-5 | initialPrompt plain
 
   MEASURE              MEASURED  AGGREGATE
   isPrimeTsExists      5/5       rate 1.00
@@ -215,8 +215,7 @@ Parameters
   baseImage      node20       a01f
   codeState      baseline     b92c
   promptSet      snerk        c7d4
-  harness        claude-code  d5e1
-  model          haiku        e3a8
+  harnessModel   claude-code@2.1.283/haiku-4-5  d5e1
   initialPrompt  plain        f20b
 
 Measures
@@ -248,7 +247,7 @@ A  01K4X9J2E8MQZ3V7R5T0WABCDE  2026-09-29  is-prime-baseline
 B  01K5A2B7C9D4F6G8H0JKMNPQRS  2026-10-02  is-prime-baseline
 All 2 permutations match by hash. Measurement sets match.
 
-Permutation 4f9a21c8  model=haiku
+Permutation 4f9a21c8  harnessModel=claude-code@2.1.283/haiku-4-5
   MEASURE              A                 B                 CHANGE
   isPrimeTsExists      rate 0.80         rate 0.40         -0.40  worse
   tsIgnoreCount        mean 0.6, max 2   mean 1.4, max 3   +0.8   worse
@@ -256,7 +255,7 @@ Permutation 4f9a21c8  model=haiku
   cost / iteration     $0.022            $0.021            -$0.001
   duration (mean)      0:43              0:44              +0:01
 
-Permutation 9be07d35  model=sonnet
+Permutation 9be07d35  harnessModel=claude-code@2.1.283/sonnet-5-5
   MEASURE              A                 B                 CHANGE
   isPrimeTsExists      rate 1.00         rate 1.00         =
   tsIgnoreCount        mean 0.0, max 0   mean 0.0, max 0   =
@@ -282,22 +281,22 @@ No permutation hashes match.
 
 Parameters that differ
   promptSet  snerk (c7d4)  ->  snerk (91ab)   same name, different content
-  model      haiku, sonnet -> haiku, sonnet   same
+  harnessModel  same two pairs in A and B
 
 Pairing permutations by the parameters that did not change:
-  A 4f9a21c8  <->  B 7d20e6b4   model=haiku
-  A 9be07d35  <->  B 02c8f7a1   model=sonnet
+  A 4f9a21c8  <->  B 7d20e6b4   harnessModel=claude-code@2.1.283/haiku-4-5
+  A 9be07d35  <->  B 02c8f7a1   harnessModel=claude-code@2.1.283/sonnet-5-5
 
 Measurement sets differ. Comparing 2 of 3 measurements.
   isPrimeTemplateTest   A: d91f6a07   B: 5e3c8b12   not comparable (version differs)
 
-Pair model=haiku
+Pair harnessModel=claude-code@2.1.283/haiku-4-5
   MEASURE          A                 B                 CHANGE
   isPrimeTsExists  rate 0.80         rate 0.80         =
   tsIgnoreCount    mean 0.6, max 2   mean 0.2, max 1   -0.4   better
   cost / iteration $0.022            $0.019            -$0.003
 
-Pair model=sonnet
+Pair harnessModel=claude-code@2.1.283/sonnet-5-5
   ...
 ```
 

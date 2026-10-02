@@ -33,8 +33,8 @@ postrun-e01k4x9j2e8mqz3-h4f9a21c8-i00
 Single repository, prefix-discriminated (`prerun-` vs `postrun-`) rather than two
 repositories. _(Referenced by: [070-data-architecture.md](070-data-architecture.md).)_
 No permutation index in the tag: the permutation hash already changes
-whenever any parameter changes — including model, even though model alone doesn't affect
-the image's filesystem — so a separate positional index would be redundant, and worse,
+whenever any parameter changes — including the model selected within a harness/model pair, even when
+that selection does not affect the image's filesystem — so a separate positional index would be redundant, and worse,
 unstable in meaning across executions if the matrix ever gets resolved in a different
 order.
 
@@ -42,8 +42,8 @@ order.
 
 ### 1. Single-permutation experiment, 3 iterations, rerun later
 
-Matrix shape `1/1/1/1/1/1` — every parameter fixed, one permutation. Permutation hash stays
-`h4f9a21c8` for as long as the base image, code state, prompt set, harness, model, and
+Matrix shape `1/1/1/1/1` — every parameter fixed, one permutation. Permutation hash stays
+`h4f9a21c8` for as long as the base image, code state, prompt set, harness/model pair, and
 initial prompt stay pinned.
 
 **First execution** (`e01k4x9j2e8mqz3`), 3 iterations:
@@ -67,9 +67,9 @@ postrun-e01k5f2n0a7xrbq-h4f9a21c8-i02
 Same prerun tag both times. Six distinct postrun images across the two occasions — this
 is what makes the month-over-month regression comparison work.
 
-### 2. Matrix shape `1/1/2/1/1/1`, 1 iteration, rerun later
+### 2. Matrix shape `1/1/2/1/1`, 1 iteration, rerun later
 
-1 base image, 1 code state, 2 prompt sets, 1 harness, 1 model, 1 initial prompt —
+1 base image, 1 code state, 2 prompt sets, 1 harness/model pair, 1 initial prompt —
 2 permutations, 1 iteration each. The two prompt sets produce two different parameter
 hashes:
 `h4f9a21c8` and `h9d3e77a0`.

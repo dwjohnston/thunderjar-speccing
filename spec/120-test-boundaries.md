@@ -71,7 +71,9 @@ Given that a real pre-run image like this exists, run the fake agent. A new real
 - The git history is correct.
 - The labels are correct.
 
-The agent is faked through the normal harness mechanism. The harness config already holds the exact CLI command to run for an agent, so the fake harness is just another harness entry whose command is a script (e.g. `node fake-agent.js`). It is not a special test-only code path. Because the script makes a known set of file changes, the resulting image can be checked exactly.
+The agent is faked through the normal harness mechanism. The harness config already holds the exact CLI command to run for an agent, so the fake harness is a [family declaration](064-harness.md#family-declaration)
+with one version and model (e.g. `fake-agent@1.0.0/fake`), whose command runs a script
+(e.g. `node fake-agent.js`). It is not a special test-only code path. Because the script makes a known set of file changes, the resulting image can be checked exactly.
 
 ### 3.3 Extracting measurement results from a post-run image
 

@@ -15,13 +15,13 @@ project glossary before diving into the rest.
 4.5. [Shipped Skills](045-shipped-skills.md) — The agent skill that spots sessions worth capturing as test cases and helps write their measurements.
 5. [Setup and Configure](050-setup-and-configure.md) — Getting the application running, plus a high-level configuration overview that references out to the detailed config pages below.
 5.1. [Configuration Folder Structure](051-configuration-folder-structure.md) — Where Thunderjar configuration lives in a user's project: parameter folders, tasks with their measurements, experiments, and generated types.
-5.5. [Declaring Experiments](055-declaring-experiments.md) — The `declareExperiment` file: the parameter matrix, typed names, and the harness × model compatibility check.
+5.5. [Declaring Experiments](055-declaring-experiments.md) — The `declareExperiment` file: the parameter matrix, typed names, and generated harness/model pair types.
 6. [Experiment Parameters](060-experiment-parameters.md) — Parameter hashing and identity (ensuring comparability), what every declaration has in common, an example declaration of each parameter, and measuring instruments.
 6.1. [Base Image](061-base-image.md) — The image a prerun image is built `FROM`.
 6.2. [Code State](062-code-state.md) — The codebase applied on top of the base image.
 6.3. [Prompt Set](063-prompt-set.md) — Overlaying prompt files from a pinned commit.
-6.4. [Harness](064-harness.md) — The agent tool: installing it, the `cli` contract, token costs, and the `models` map.
-6.5. [Model](065-model.md) — The root LLM, and why its ID belongs to the harness.
+6.4. [Harness/Model Pair](064-harness.md) — Families, versions, model maps, invocation, token collection and pair hashing.
+6.5. [Model](065-model.md) — The root LLM and its explicit per-family ID map.
 6.6. [Task](066-task.md) — The task, its initial prompts, and the task measurements that live beside them.
 7. [Data Architecture](070-data-architecture.md) — The run data store and image store.
 7.1. [Data Persistence](071-data-persistence.md) — Open questions about how the run data store is kept and shared across machines.

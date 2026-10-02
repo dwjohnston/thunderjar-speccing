@@ -4,6 +4,11 @@ What's in scope vs. explicitly not.
 
 ## Non-goals (v1)
 
+- **Central model catalogue and ID transformations.** v1 uses explicit model-to-ID
+  maps per harness family. Shared declarations or automatic ID prefixes are deferred.
+  See [065-model.md](065-model.md#harness-specific-ids).
+  _(Referenced by: [065-model.md](065-model.md).)_
+
 - **Retention/purge policy for preserved images and metadata.** No TTLs, no
   differentiated retention by pass/fail, no pruning. Assume everything is kept
   indefinitely for now; revisit once storage cost or volume actually becomes a
@@ -57,7 +62,7 @@ What's in scope vs. explicitly not.
 
 Unresolved, but things we *are* intending to address in v1 — unlike the non-goals above.
 
-- **Thunderjar's own injected setup in the Docker image.** Beyond the six experiment
+- **Thunderjar's own injected setup in the Docker image.** Beyond the five experiment
   parameters, Thunderjar itself may need to bake things into the image that aren't any
   experimenter's concern — e.g. OTel collector config or other instrumentation needed
   for telemetry. Where this fits in the image-build sequence is unresolved. (See

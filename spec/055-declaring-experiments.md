@@ -15,8 +15,7 @@ export default declareExperiment({
   baseImage: ["node20"],
   codeState: ["baseline"],
   promptSet: ["snerk", "glurk"],
-  harness: ["claude-code-2-1-283"],
-  model: ["haiku-4-5"],
+  harnessModel: ["claude-code@2.1.283/haiku-4-5", "codex@0.9.0/gpt-luna"],
   task: "is-prime",
   initialPrompt: ["plain", "terse"],
   iterations: 5,
@@ -28,21 +27,22 @@ export default declareExperiment({
 | `baseImage` | [Base images](061-base-image.md) to run. |
 | `codeState` | [Code states](062-code-state.md) to run. |
 | `promptSet` | [Prompt sets](063-prompt-set.md) to run. |
-| `harness` | [Harnesses](064-harness.md) to run. |
-| `model` | [Models](065-model.md) to run. |
+| `harnessModel` | [Harness/model pairs](064-harness.md#addressing-a-pair) to run. |
 | `task` | The [task](066-task.md) the experiment is about. One name, not an array. |
 | `initialPrompt` | The task's [initial prompts](066-task.md#initial-prompts) to run. |
 | `iterations` | How many times each permutation runs. |
 
-Each parameter field is an array of names. Each name is a folder under
-`experiment-parameters/<kind>/`, except `initialPrompt`, whose names are files under the
-chosen task's `initial-prompts/` folder.
+Each parameter field is an array of names. Base image, code state and prompt set names select
+folders under `experiment-parameters/`. A harness/model name selects a family, version
+and model as [defined on the family](064-harness.md#family-declaration). Initial prompt
+names select files under the chosen task's `initial-prompts/` folder.
 
 ## An experiment is a matrix
 
-The six arrays form a cross product, and each combination is one permutation. The
-example above has four: `snerk` and `glurk`, each with `plain` and `terse`, with everything
-else held fixed.
+The five arrays form a cross product, and each combination is one permutation. The
+example above has eight: two prompt sets × two harness/model pairs × two initial prompts,
+with base image and code state held fixed.
+_(Referenced by: [004-addressing-harness-model-pair.md](004-addressing-harness-model-pair.md).)_
 
 ## One task, not measurements
 
@@ -56,8 +56,9 @@ can't be, so running a harness across several tasks is several experiments.
 
 ## Typed names
 
-The strings in `declareExperiment` are not free text. A generation step reads the
-folder names under `experiment-parameters/` and emits their union types into
+The strings in `declareExperiment` are not free text. A generation step reads
+parameter names and harness family maps under `experiment-parameters/`, emitting
+their union types into
 `_generated/parameter-names.d.ts`, so a misspelled or deleted parameter is a type error
 in the experiment file. The folder is git-ignored — see
 [022-coding-conventions.md](022-coding-conventions.md#generated-files-go-in-_generated-and-are-git-ignored).
@@ -74,34 +75,36 @@ type InitialPromptNames = { "is-prime": "plain" | "terse" };
 the prompts of the task named in `task`. A prompt that belongs to another task is a type
 error.
 
-## Harness and model must be compatible
+## Typed pairs
 
-The generation step also reads each harness's
-[`models` map](064-harness.md#models-which-models-it-runs) and emits which models each
-harness can run:
+The generator reads each family's `versions.ts` and `models.ts` from the
+[family declaration](064-harness.md#family-declaration). It emits the valid pair strings
+as template-literal types: each family's versions × its models, united across families.
 
 ```ts
 // _generated/parameter-names.d.ts
-type HarnessModels = {
-  "claude-code-2-1-283": "sonnet-5-5" | "haiku-4-5";
-  "opencode-1-4-0": "sonnet-5-5" | "gpt-5";
-};
+type HarnessModelName =
+  | `claude-code@${"2.1.283" | "2.2.0"}/${"haiku-4-5" | "sonnet-5-5"}`
+  | `codex@${"0.9.0"}/${"gpt-luna"}`;
 ```
 
-`harness` and `model` form a cross product, so every listed model must be runnable by
-every listed harness. Anything else is a type error on the `model` array:
+Every pair is checked on its own. Mixed families and models can share one experiment.
+A pair naming a model or version absent from its family is a type error.
 
 ```ts
 export default declareExperiment({
-  harness: ["claude-code-2-1-283", "opencode-1-4-0"],
-  model: ["sonnet-5-5", "gpt-5"],
-  //                    ~~~~~~~ Type '"gpt-5"' is not assignable to type '"sonnet-5-5"'.
+  harnessModel: [
+    "claude-code@2.1.283/haiku-4-5",
+    "codex@0.9.0/gpt-luna",
+    "claude-code@2.1.283/gpt-luna", // type error: model absent from this family
+  ],
   // …
 });
 ```
 
-An experiment that needs different models on different harnesses is declared as two
-experiments.
+_(Referenced by: [064-harness.md](064-harness.md#versions-and-overrides),
+[004-addressing-harness-model-pair.md](004-addressing-harness-model-pair.md),
+[110-cli-report-visualization.md](110-cli-report-visualization.md).)_
 
 ## Open questions
 

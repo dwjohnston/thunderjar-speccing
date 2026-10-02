@@ -45,7 +45,7 @@ nothing. It checks that:
 
 - the Docker daemon is reachable;
 - the registry accepts a push to the image store repository;
-- every environment variable named by a harness's `requiredEnv` is set, and any variable
+- every environment variable required by declared harness versions is set, and any variable
   the run data store names (e.g. `urlEnv`) is set;
 - the run data store can be opened;
 - the configuration loads.
@@ -58,7 +58,8 @@ Each check reports pass or fail, with the reason on failure. Exits non-zero if a
 thunderjar generate
 ```
 
-Reads the folder names under `experiment-parameters/` and writes
+Reads parameter names and harness family version/model maps under
+`experiment-parameters/` and writes
 `_generated/parameter-names.d.ts`, so a misspelled or deleted parameter is a type error in
 an experiment file. See [055-declaring-experiments.md](055-declaring-experiments.md#typed-names).
 Whether this is a standalone command or runs implicitly before the others is open there.

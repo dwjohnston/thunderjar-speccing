@@ -65,12 +65,15 @@ Thunderjar never parses the result file. It hands the bytes to that same harness
 - **OpenCode** emits a final event with tokens and cost, but it is known to sometimes not
   be emitted at all.
 
-So normalisation is harness-specific knowledge, and it lives with the harness. The
-collector is a pure function from the file's contents, which keeps it unit-testable
+Normalisation is harness-specific knowledge. The family's
+[collector file](064-harness.md#collecttokencosts-reading-back-the-cost) receives the raw
+contents and the resolved pair's version and model ID. It is a pure function of those
+inputs, which keeps it unit-testable
 against a fixture — layer 1 of [120-test-boundaries.md](120-test-boundaries.md).
 
 ```ts
-collectTokenCosts: (raw: string) => TokenCosts;
+type CollectorContext = { version: string; modelId: string };
+collectTokenCosts: (raw: string, ctx: CollectorContext) => TokenCosts;
 
 type TokenCosts =
   | {
@@ -107,12 +110,12 @@ type ModelTokenCosts = {
 }
 ```
 
-_(Referenced by: [064-harness.md](064-harness.md).)_
+_(Referenced by: [064-harness.md](064-harness.md#collecttokencosts-reading-back-the-cost).)_
 
 ### Why per-model, and not one total
 
 A total is derivable by summing; a breakdown can't be recovered from a total. The model
-mix is precisely what's being observed — the [model parameter](030-terminology.md#experiment-parameters)
+mix is precisely what's being observed — the [harness/model pair](064-harness.md#addressing-a-pair)
 pins only the root model, so which model a delegated sub-agent actually used is an
 *outcome*, not something the matrix controls. "This prompt set made it reach for the
 expensive model" is a finding, and it's only visible per-model.
@@ -212,10 +215,12 @@ as measurements: a corrected or extended `collectTokenCosts` can be applied to h
 runs without re-running the agent. Start a measurement container from the postrun image,
 re-read the file, re-collect.
 
-The [accepted tradeoff](064-harness.md#accepted-tradeoffs) is that
-`collectTokenCosts` sits inside the harness declaration and is therefore part of its
-parameter hash, so correcting it marks old runs as not directly comparable — a warning, not
-an error.
+The [pair's hash boundary](064-harness.md#hashing) excludes the collector file.
+Correcting the parser leaves the execution identity unchanged. Re-collection uses the
+current family collector with the run's original resolved version and model ID; those
+values must be stored with the run so floating entries and later map edits cannot
+change interpretation context.
+_(Referenced by: [085-experiment-results.md](085-experiment-results.md).)_
 
 ## Open questions
 

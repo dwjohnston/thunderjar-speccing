@@ -105,8 +105,9 @@ under Credentials.
 
 ## Credentials
 
-Each [harness](064-harness.md#requiredenv-credentials) declares the names of the
-environment variables its agent needs (`requiredEnv`). The user exports them in the shell
+Each [harness family](064-harness.md#requiredenv-credentials) declares the names of
+the environment variables its agent needs (`requiredEnv`); a selected version may
+override the list. The user exports them in the shell
 or CI secret store that runs Thunderjar. Thunderjar passes only those variables into that
 harness's containers, and fails before building anything if one is unset.
 
@@ -138,7 +139,7 @@ Three rules, all of the same shape: config names things, never holds secrets.
 
 | What | How it authenticates | Who reads it |
 |---|---|---|
-| Harness (agent API key) | `requiredEnv` on the harness declaration | Passed into that harness's containers |
+| Harness (agent API key) | `requiredEnv` on the harness family declaration | Passed into that harness's containers |
 | Run data store (remote) | An env var named in the config, holding a connection URL with credentials, e.g. `urlEnv: "THUNDERJAR_DB_URL"` | The Thunderjar process on the host. No container sees it. |
 | Image store | The user's existing `docker login` for the registry. Thunderjar holds no registry credentials. In CI the pipeline logs in first. | Docker |
 
@@ -152,4 +153,4 @@ secrets managers are later store constructors behind the same interface.
   [071-data-persistence.md](071-data-persistence.md).
 
 - Harnesses whose required variables depend on the model's provider (Bedrock, Vertex).
-  v1 declares one harness per provider.
+  v1 declares one harness family per provider.

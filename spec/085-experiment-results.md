@@ -129,6 +129,7 @@ type ContainerRunRecord = {
 
   // each resolved parameter, by name and parameter hash
   parameters: Record<ParameterKind, { name: string; parameterHash: string }>;
+  harnessModel: { family: string; version: string; modelId: string }; // resolved pair
 
   result: Result;
   tokenCosts: TokenCosts; // see 087
@@ -148,10 +149,11 @@ type ContainerRunRecord = {
     baseImage:       { name: "node20",      parameterHash: "a01f…" },
     codeState:       { name: "baseline",    parameterHash: "b92c…" },
     promptSet:       { name: "snerk",       parameterHash: "c7d4…" },
-    harness:         { name: "claude-code", parameterHash: "d5e1…" },
-    model:           { name: "haiku",       parameterHash: "e3a8…" },
+    harnessModel:    { name: "claude-code@2.1.283/haiku-4-5", parameterHash: "d5e1…" },
     initialPrompt:   { name: "plain",       parameterHash: "f20b…" },
   },
+  harnessModel: { family: "claude-code", version: "2.1.283",
+    modelId: "claude-haiku-4-5-20251001" },
   result: { /* as above */ },
   tokenCosts: { /* as above */ },
   execution: { startedAt: 1790692255104, finishedAt: 1790692297416, exitCode: 0 },
@@ -326,6 +328,9 @@ instrument's own logic under test.
 
 A backfilled measure also triggers recomputing its permutation's
 [aggregation result](#aggregation-results).
+
+The resolved pair's family, version and model ID are stored for
+[re-collecting token costs](087-collecting-token-costs.md#backfilling-token-costs).
 
 Token costs are backfillable on the same terms, since the harness's result file is
 preserved in the image too — see

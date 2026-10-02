@@ -2,26 +2,23 @@
 
 Parameter hashing and identity, what every declaration has in common, and an
 example of each parameter's declaration. Each parameter's detail is on its own page,
-061 to 066. Also covers measuring instruments. Builds on the six
+061 to 066. Also covers measuring instruments. Builds on the five
 [experiment parameters](030-terminology.md#experiment-parameters) already named
 in the glossary.
 
 ## Parameter hashing and identity
 
-- Every experiment parameter folder (`experiment-parameters/<kind>/<name>/`)
-  hashes its full content — `index.ts` plus any bundled scripts, templates, or
-  fixtures — to a **parameter hash**. Measurements are hashed the same way, to a
-  *content hash*, even though they aren't experiment parameters: hashing them catches
-  silent drift when a named definition's content changes underneath it.
-- A permutation's **permutation hash** combines the parameter hashes of its six
-  resolved experiment parameters (base image, code state, prompt set, harness,
-  model, initial prompt), plus the model ID the harness resolves the model to (see
-  [064-harness.md](064-harness.md#hashing)). Two container runs are only directly comparable if
-  their permutation hashes match.
-- A harness's `models` map is excluded from its parameter hash. Adding a model
-  to a harness doesn't change any existing permutation hash; changing one
-  model's ID changes only that model's permutations, through the resolved
-  model ID.
+- Base image, code state and prompt set folders hash their full content — `index.ts`
+  plus any bundled scripts, templates or fixtures — to a **parameter hash**. Initial
+  prompts are hashed individually; harness/model pairs use the boundary below.
+  Measurements are hashed the same way, to a *content hash*, even though they aren't
+  experiment parameters: hashing them catches silent drift when a named definition's content changes underneath it.
+- A permutation's **permutation hash** combines the hashes of its five resolved
+  parameters: base image, code state, prompt set, harness/model pair and initial prompt.
+  Two container runs with the same hash have the same declared execution inputs.
+- A [harness/model pair's hash](064-harness.md#hashing) includes shared execution
+  content, the resolved version with its execution overrides, and the resolved model ID.
+  The family maps and token-cost collector are excluded by location from shared content.
 - A declaration can add to, or replace, what its parameter hash is derived from — see
   [Controlling the parameter hash](#controlling-the-parameter-hash).
 - Parameter hash is derived from content, not name — renaming a folder doesn't
@@ -31,8 +28,8 @@ in the glossary.
 
 ## Controlling the parameter hash
 
-By default a parameter hash comes from its folder's content. A declaration
-can change that with one of two optional functions. Each returns a shell command.
+For base image, code state, prompt set and initial prompt declarations, the default
+hash comes from declaration content. A declaration can change that with one of two optional functions. Each returns a shell command.
 Thunderjar runs the command on the host at the start of each experiment execution, and
 uses its output.
 
@@ -50,6 +47,9 @@ determineHash?: () => string;  // a command; its output is hashed instead of the
 
 If a declaration provides both, `determineHash` takes precedence and `additionalHash`
 is ignored.
+
+Harness families use the [pair hash boundary](064-harness.md#hashing). A version
+entry's `determineHash` resolves its version; it does not replace the whole pair hash.
 
 ```ts
 // experiment-parameters/codeStates/main/index.ts
@@ -91,17 +91,19 @@ the permutation hash is different, and the execution is recorded as a different
 permutation of the same named parameters.
 
 This is sometimes called a *floating parameter*. It is not a separate kind of parameter
-and Thunderjar has no special handling for it: it is a declaration that uses
-`determineHash`. Any parameter can do it — a prompt set following a branch, a harness
-following its latest release.
+and uses `determineHash`. Examples include a prompt set following a branch and a
+harness version entry following a locally recorded release. Pair version resolution
+is defined in [064-harness.md](064-harness.md#versions-and-overrides); it preserves the family
+execution content and model ID in the pair hash.
 
 ## Declarations and `applyParameter`
 
 Each parameter is set by its [declaration](030-terminology.md#declaration) —
-the `index.ts` in its folder, whose default export is wrapped in that kind's
-`declareX()` function (`declareHarness`, `declareModel`, …) per
+its file, or its family and selected map entries for a harness/model pair. Each
+default export is wrapped in that kind's
+`declareX()` function (`declareHarness`, `declareBaseImage`, …) per
 [022-coding-conventions.md](022-coding-conventions.md#declarex-functions-not-bare-exports).
-Every declaration exposes the same function:
+Each resolved parameter exposes the same function:
 
 ```ts
 applyParameter: (ctx) => string; // a Dockerfile fragment
@@ -127,7 +129,7 @@ WORKDIR /workspace
 RUN npm ci                                               # code state
 COPY prompt-set/CLAUDE.md /workspace/CLAUDE.md           # Thunderjar: prompt set's files
 COPY --from=thunderjar/harness-claude-code:2.1.283 \
-  /opt/claude /opt/claude                                # harness
+  /opt/claude /opt/claude                                # harness/model pair
 ```
 
 Fragments are Dockerfile source rather than bare shell commands, because the
@@ -138,21 +140,20 @@ The order matches the build sequence in
 
 ### Build-time and run-time parameters
 
-Only four of the six contribute to the image. The other two are consumed when
-the harness is invoked, and their `applyParameter` returns an empty string:
+Four of the five parameters contribute to the image. The initial prompt is consumed
+when the harness is invoked; its `applyParameter` returns an empty string:
 
 | Parameter | Build time | Run time |
 |---|---|---|
 | Base image | seed of the build | — |
 | Code state | commit, then dependencies / fixture generation | — |
 | Prompt set | prompt files | — |
-| Harness | installs the agent tool | invoked via `cli` |
-| Model | — | `ctx.modelId` |
+| Harness/model pair | installs the selected harness version | invoked via `cli` with the resolved version and model ID |
 | Initial prompt | — | `ctx.initialPrompt` |
 
 This split is the same one the flowchart in
 [080-docker-execution.md](080-docker-execution.md#process) draws as its
-per-permutation and per-iteration stages. All six keep the function even so:
+per-permutation and per-iteration stages. All five keep the function even so:
 the fold needs no special cases, and a kind that is a no-op today can gain
 build-time setup later without changing the system's shape.
 
@@ -195,51 +196,27 @@ export default declarePromptSet({
 });
 ```
 
-## Harness
+## Harness/model pair
 
-A named, version-pinned definition of an agent tool. It is installed into the image,
-invoked to do the work, and read back afterwards for what the run cost. Detail:
-[064-harness.md](064-harness.md).
-
-```ts
-// experiment-parameters/harnesses/claude-code-2-1-283/index.ts
-const version = "2.1.283";
-
-export default declareHarness({
-  version,
-
-  // build: layer the tool into the prerun image
-  applyParameter: () =>
-    `COPY --from=thunderjar/harness-claude-code:${version} /opt/claude /opt/claude`,
-
-  // run: execute the agent, and write the result file
-  cli: (ctx) =>
-    `claude -p "${ctx.initialPrompt}" --model ${ctx.modelId} ` +
-    `--allowedTools "Write,Edit,Read,Bash" --output-format json > ${ctx.resultPath}`,
-
-  // interpret: turn that file's contents into normalised token costs
-  collectTokenCosts: (raw) => { /* … */ },
-
-  // which models this harness runs, and the ID it passes for each
-  models: {
-    "sonnet-5-5": "claude-sonnet-5-5",
-    "haiku-4-5": "claude-haiku-4-5-20251001",
-  },
-});
-```
-
-## Model
-
-The root LLM the harness is invoked with. The folder name is its identity; the ID
-passed on the command line belongs to each harness. Detail:
+A family, version and model selected together. The family provides installation and
+invocation logic; the selected entries supply the resolved version and model ID.
+Declaration and hashing detail: [064-harness.md](064-harness.md); model mapping:
 [065-model.md](065-model.md).
 
 ```ts
-// experiment-parameters/models/haiku-4-5/index.ts
-export default declareModel({
-  applyParameter: () => ``,
+// experiment-parameters/harnessModels/claude-code/index.ts
+export default declareHarness({
+  applyParameter: (ctx) =>
+    `RUN npm install -g @anthropic-ai/claude-code@${ctx.version}`,
+  cli: (ctx) =>
+    `claude -p "${ctx.initialPrompt}" --model ${ctx.modelId} ` +
+    `--output-format json > ${ctx.resultPath}`,
+  requiredEnv: ["ANTHROPIC_API_KEY"],
 });
 ```
+
+The family's `models.ts`, `versions.ts` and `collectTokenCosts.ts` are declared
+separately, as shown in [064-harness.md](064-harness.md#family-declaration).
 
 ## Initial prompt
 
@@ -335,7 +312,10 @@ than a boolean — a measurement, not a verdict. The glob matching nothing gives
 - What happens when an `additionalHash` or `determineHash` command exits non-zero.
 - Whether the command's output is stored alongside the hash, so a report can show the
   commit an execution resolved to rather than only its hash.
-- What else `applyParameter`'s `ctx` carries, beyond `resolvedHash`.
+- What else `applyParameter`'s `ctx` carries, beyond `resolvedHash` and the
+  harness/model pair's resolved `version` and `modelId`.
+- Imports from outside a declaration folder are not hashed. A change to such a helper
+  can change execution without changing the parameter hash.
 - Nothing stops a declaration returning a fragment that isn't reproducible
   (`RUN apt-get install foo`). The prerun image being built once and reused
   bounds the damage within a permutation's lifetime, but the hash can't detect

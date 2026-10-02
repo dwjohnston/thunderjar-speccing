@@ -43,7 +43,7 @@ questions later:
 
 This is why an experiment is captured as task + measurements against a stable
 identity, rather than thrown away after the session that produced it: the
-[experiment parameters](030-terminology.md#experiment-parameters) (model, prompt
+[experiment parameters](030-terminology.md#experiment-parameters) (harness/model pair, prompt
 set, code state) are the axis you vary later, holding the rest fixed.
 
 ## CI workflows
