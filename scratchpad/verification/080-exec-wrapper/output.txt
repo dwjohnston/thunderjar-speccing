@@ -1,0 +1,8 @@
+cmd: sleep 1
+{"startedAt":1790920916654,"finishedAt":1790920917665,"exitCode":0}
+valid JSON, elapsed ms: 1011
+cmd: sh -c 'exit 3'
+{"startedAt":1790920917690,"finishedAt":1790920917692,"exitCode":3}
+valid JSON, elapsed ms: 2
+--- date %3N support (GNU coreutils):
+date (GNU coreutils) 9.4

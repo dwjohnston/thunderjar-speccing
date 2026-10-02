@@ -1,0 +1,8 @@
+# git version
+git version 2.43.0
+# branch names from restore are valid refs?
+thunderjar/postrun-e01K4X9J2E8MQZ3V7R5T0WABCDE-h4f9a21c8-i00
+valid: thunderjar/postrun-e01K4X9J2E8MQZ3V7R5T0WABCDE-h4f9a21c8-i00
+# example IDs match ULID format (26 chars Crockford base32)?
+ULID ok: 01K4X9J2E8MQZ3V7R5T0WABCDE
+ULID ok: 01K5A2B7C9D4F6G8H0JKMNPQRS

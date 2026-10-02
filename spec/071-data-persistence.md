@@ -23,3 +23,13 @@ store interface and `sqliteStore` in
     the concurrent-write problem.
   - **Ship a remote store in v1** (e.g. `postgresStore({ urlEnv })`), which removes the
     problem. The cost is more v1 scope.
+
+## Verification
+
+- **Commit the file** (binary, concurrent writes conflict): confirmed. Git cannot merge
+  binary files ([gitattributes: binary](https://git-scm.com/docs/gitattributes#_marking_files_as_binary));
+  demo: [scratchpad/verification/071-sqlite-git-conflict/](../scratchpad/verification/071-sqlite-git-conflict/test.sh)
+  ([output](../scratchpad/verification/071-sqlite-git-conflict/output.txt)) shows two branches
+  writing to a SQLite file ending in `CONFLICT ... Cannot merge binary files`.
+- Remaining claims (CI artifacts, S3 sync, registry sharing images) are design choices or
+  generic; nothing further to verify.

@@ -23,3 +23,13 @@ image pull. See [020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1).
 ## Open questions
 
 _TBD_
+
+## Verification
+
+- Prefix-discriminated tags in a single repository are valid: Docker/OCI tags match
+  `[\w][\w.-]{0,127}`, so `prerun-…` / `postrun-…` are legal and a repository may hold any
+  number of tags ([distribution/reference](https://github.com/distribution/reference/blob/main/reference.go),
+  [Docker docs](https://docs.docker.com/reference/cli/docker/image/tag/)).
+  Demo: [scratchpad/verification/070-tag-grammar/](../scratchpad/verification/070-tag-grammar/test.sh).
+- Claims that the trace and transcript are inside the postrun image, and that a pull is
+  needed to read them, are design choices; not externally verifiable.

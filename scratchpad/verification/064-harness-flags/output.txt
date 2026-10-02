@@ -1,0 +1,14 @@
+== claude --version
+2.1.287 (Claude Code)
+== claude --help (flags used by the example cli)
+  --allowedTools, --allowed-tools <tools...>
+                                        --print and --output-format=stream-json)
+                                        --output-format=stream-json)
+                                        --output-format=stream-json)
+  --model <model>                       Model for the current session. Provide
+  --output-format <format>              Output format (only works with --print):
+  -p, --print                           Print response and exit (useful for
+                                        --output-format=stream-json)
+== docker run --help: -e/--env
+  -e, --env list                         Set environment variables
+== docker COPY --from is Dockerfile syntax (no daemon to build here)

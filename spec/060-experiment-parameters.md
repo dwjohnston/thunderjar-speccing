@@ -335,3 +335,19 @@ than a boolean — a measurement, not a verdict. The glob matching nothing gives
 - Whether "artifact" should become the umbrella term for every hashed,
   reusable definition (harness, prompt set, measuring instrument, code state)
   — flagged in `030-terminology.md`, unresolved.
+
+## Verification
+
+- Verified: `claude -p`, `--model`, `--allowedTools`, and `--output-format json` exist
+  and behave as the harness example assumes
+  ([CLI reference](https://code.claude.com/docs/en/cli-reference)). Also confirmed
+  against local `claude --help`.
+- Verified: `git rev-parse <branch>` prints the commit a branch points at (run locally
+  in a scratch repo).
+- Not verified (docs.docker.com blocked by the sandbox proxy, no Docker daemon to
+  demo): `RUN` layer caching keyed on instruction text, `COPY --from=<image>`, and
+  `docker image inspect --format '{{.Id}}'`. See the Docker
+  [build cache](https://docs.docker.com/build/cache/invalidation/) and
+  [Dockerfile reference](https://docs.docker.com/reference/dockerfile/) pages.
+- Not verified: the model IDs in the harness example (`claude-haiku-4-5-20251001`,
+  `claude-sonnet-5-5`) against the [models overview](https://docs.claude.com/en/docs/about-claude/models/overview).

@@ -62,3 +62,13 @@ user.
   task.
 - Whether checking a measurement against the session's files is enough, or the skill
   should run it in a [measurement container](030-terminology.md#measurement-container).
+
+## Verification
+
+Checked against the [Claude Code skills docs](https://code.claude.com/docs/en/skills):
+
+- A skill's `description` is what the agent matches against to decide when to apply it, so using it to carry the signals in the table above is supported.
+- Skills can also be invoked directly by name (`/skill-name`), matching "the user can also invoke the skill directly".
+- Skills run inline in the user's current session by default (shared conversation context, files and tools), matching "run inside the user's own coding sessions". Only `context: fork` isolates them.
+
+Not verified (design choices, nothing external to check): the offer wording, the scenario table, the measurement workflow. No demo: nothing here is mechanically demonstrable.

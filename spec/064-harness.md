@@ -161,3 +161,18 @@ it.
   now: keeping the harness's three phases in one declaration is worth more than the
   hash precision, and a hash change is a warning rather than an error. Token costs stay
   re-derivable regardless, since the raw result file is preserved in the postrun image.
+
+## Verification
+
+- `claude -p`, `--model`, `--allowedTools`, `--output-format json` exist as used in the
+  example `cli` ([CLI reference](https://code.claude.com/docs/en/cli-reference)). Demo:
+  [scratchpad/verification/064-harness-flags/](../scratchpad/verification/064-harness-flags/test.sh)
+  (flag presence only; no API call).
+- Model alias/full-name values for `--model` are accepted per the same page. The exact IDs
+  in the examples (`claude-sonnet-5-5`, `claude-haiku-4-5-20251001`) were not checked
+  against the [models list](https://docs.claude.com/en/docs/about-claude/models/overview).
+- Not verified: that `--output-format json` output contains the token usage fields
+  `collectTokenCosts` needs (see [087](087-collecting-token-costs.md)); that `docker run -e NAME`
+  copies the caller's value (docs.docker.com blocked by the proxy; `docker run --help`
+  only lists `-e, --env`); that `COPY --from=<image>` works with an external image (no
+  Docker daemon in this sandbox).

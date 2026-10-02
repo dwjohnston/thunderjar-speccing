@@ -1,0 +1,2 @@
+tsc version: Version 6.0.2
+--- src/ok.ts

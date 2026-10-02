@@ -1,0 +1,4 @@
+== node:20-bookworm on Docker Hub ==
+name: 20-bookworm
+last_updated: 2026-04-22T17:38:20.75926Z
+platforms: ['linux/amd64', 'linux/arm', 'linux/arm64', 'linux/ppc64le', 'linux/s390x', 'unknown/unknown']

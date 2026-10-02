@@ -1,0 +1,4 @@
+rev-parse main -> bba34fbe5eedfd5378424316a47a62773dcefa80
+tree of that commit -> 7385b9ca65269b27de63aea3ddff716dd768c253
+main moved -> dee8740e1b6ab96cf88df91bc0c382a7331b04da
+after checkout, f.txt = one; tree = 7385b9ca65269b27de63aea3ddff716dd768c253

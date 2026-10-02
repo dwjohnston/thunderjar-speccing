@@ -1,0 +1,8 @@
+--- git merge ci into dev
+warning: Cannot merge binary files: runs.db (HEAD vs. ci)
+Auto-merging runs.db
+CONFLICT (content): Merge conflict in runs.db
+Automatic merge failed; fix conflicts and then commit the result.
+exit=1
+--- git status
+UU runs.db

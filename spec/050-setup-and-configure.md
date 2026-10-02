@@ -149,3 +149,22 @@ secrets managers are later store constructors behind the same interface.
 
 - Harnesses whose required variables depend on the model's provider (Bedrock, Vertex).
   v1 declares one harness per provider.
+
+## Verification
+
+- **Bun via the npm package: verified by demo.** With no global Bun on `PATH`, a `#!/usr/bin/env bun`
+  bin runs via `npx` and `npm run`, and fails with `env: 'bun': No such file or directory` when
+  `node_modules/.bin/<bin>` is invoked directly. See
+  [scratchpad/verification/050-bun-shebang/](../scratchpad/verification/050-bun-shebang/test.sh)
+  (`output.txt`). The [`bun` npm package](https://www.npmjs.com/package/bun) exposes `bun` and `bunx` bins
+  and has a `postinstall` script.
+- **`--ignore-scripts`: confirmed problem.** The same demo shows `npm install --ignore-scripts` leaves
+  Bun unusable (`Bun's postinstall script was not run`), and the message says pnpm, which skips
+  dependency postinstall scripts by default, is affected too. This answers the first open question
+  under [Open questions about install](#open-questions-about-install); pnpm needs the script
+  allowed explicitly.
+- **`bun build --compile`:** exists per [Bun docs](https://bun.sh/docs/bundler/executables). Not run here.
+- **`docker login`** as the registry credential for pushes: per
+  [Docker docs](https://docs.docker.com/reference/cli/docker/login/). Not run here.
+- **Not verified:** the AWS CDK / Pulumi scaffolding precedent, Vite / Drizzle TypeScript config
+  loading, Windows `.cmd` shims.

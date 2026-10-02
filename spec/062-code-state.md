@@ -58,3 +58,17 @@ Build time only. Its fragment runs after the base image's and before the prompt 
   its parameter hash (see
   [051-configuration-folder-structure.md](051-configuration-folder-structure.md)). How a
   bundled file reaches the image build is not defined.
+
+## Verification
+
+- A commit SHA identifies exactly one tree, and `git checkout <sha>` reproduces it after
+  the branch moves: [git-rev-parse](https://git-scm.com/docs/git-rev-parse),
+  [git-checkout](https://git-scm.com/docs/git-checkout), [Git objects](https://git-scm.com/book/en/v2/Git-Internals-Git-Objects).
+  Demo: [scratchpad/verification/062-code-state/](../scratchpad/verification/062-code-state/test.sh)
+  ([output](../scratchpad/verification/062-code-state/output.txt)).
+- A fragment of `RUN ...` lines is valid Dockerfile syntax:
+  [Dockerfile reference: RUN](https://docs.docker.com/reference/dockerfile/#run).
+- Caveat: `RUN git checkout` needs the repository and the commit to already be present in
+  the image build context; abbreviated SHAs like `a1b2c3` may become ambiguous as a
+  repository grows ([git-rev-parse](https://git-scm.com/docs/git-rev-parse)), so full SHAs
+  are safer. Not verified: how the repo gets into the image (design-level, see Open questions).
