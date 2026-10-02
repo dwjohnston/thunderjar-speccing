@@ -1,0 +1,6 @@
+git version 2.43.0
+run 1:
+a52d127025896be6bead34296ac61008e5332573
+run 2 (different temp dir):
+a52d127025896be6bead34296ac61008e5332573
+IDENTICAL hashes

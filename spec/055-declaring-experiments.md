@@ -107,3 +107,17 @@ experiments.
 
 - When the generation step runs — on demand, in a watch mode, or as part of every
   Thunderjar command.
+
+## Verification
+
+- Typed names, task-restricted `initialPrompt`, and the harness/model intersection check
+  are all expressible in TypeScript with a generic function, `NoInfer` and a
+  distributive conditional type ([generics](https://www.typescriptlang.org/docs/handbook/2/generics.html),
+  [conditional types](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html),
+  [`NoInfer`](https://www.typescriptlang.org/docs/handbook/utility-types.html#noinfertype)).
+  Demo: [scratchpad/verification/055-typed-experiments/](../scratchpad/verification/055-typed-experiments/test.sh)
+  reproduces the exact `Type '"gpt-5"' is not assignable to type '"sonnet-5-5"'` error shown
+  above. A naive `model: HarnessModels[H][]` gives a union, not an intersection, and
+  accepts `gpt-5`; the declaration needs the intersection type used in the demo.
+- A `.d.ts` containing only global `type` declarations is visible to the whole project
+  without imports.

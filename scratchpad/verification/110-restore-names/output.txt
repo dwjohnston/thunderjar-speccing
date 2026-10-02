@@ -1,0 +1,6 @@
+## git: is thunderjar/<name> a valid branch name?
+thunderjar/postrun-e01K4X9J2E8MQZ3V7R5T0WABCDE-h4f9a21c8-i03
+valid
+## docker reference grammar (distribution/reference): path-component := [a-z0-9]+ (separator [a-z0-9]+)*
+INVALID image name: postrun-e01K4X9J2E8MQZ3V7R5T0WABCDE-h4f9a21c8-i03
+valid image name:   postrun-e01k4x9j2e8mqz3v7r5t0wabcde-h4f9a21c8-i03

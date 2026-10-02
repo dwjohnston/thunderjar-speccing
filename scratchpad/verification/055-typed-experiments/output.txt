@@ -1,2 +1,9 @@
 tsc version: Version 6.0.2
 --- src/ok.ts
+OK: no type errors
+--- src/bad-model.ts
+src/bad-model.ts(4,25): error TS2322: Type '"gpt-5"' is not assignable to type '"sonnet-5-5"'.
+--- src/bad-prompt.ts
+src/bad-prompt.ts(4,59): error TS2322: Type '"asc"' is not assignable to type '"plain" | "terse"'.
+--- src/bad-name.ts
+src/bad-name.ts(3,15): error TS2820: Type '"snerkk"' is not assignable to type 'PromptSetName'. Did you mean '"snerk"'?

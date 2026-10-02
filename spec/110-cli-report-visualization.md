@@ -391,3 +391,12 @@ error: no postrun image found for postrun-e01KXXXXXXXXXXXXXXXXXXXXXX-h00000000-i
   aggregate values.
 - **Terminal width.** How the tables degrade in narrow terminals and when many permutations are
   shown.
+
+## Verification
+
+Most of this page is design illustration; only the git and image-name claims are checkable.
+
+- **Branch name** `thunderjar/postrun-e01K…-i03` is a valid git ref: `git check-ref-format --branch` accepts it (git docs: https://git-scm.com/docs/git-check-ref-format).
+- **Contradicted:** the container-run / image name `postrun-e01K4X9J2E8MQZ3V7R5T0WABCDE-h4f9a21c8-i03` contains uppercase letters (the ULID). Docker image references allow only lowercase `[a-z0-9]` in path components ([distribution/reference grammar](https://github.com/distribution/reference/blob/main/reference.go)), so it is not a valid image name as written. Not rewritten here; the naming scheme is owned by another page and needs a lowercase ULID (or similar).
+- Demo: [`scratchpad/verification/110-restore-names/`](../scratchpad/verification/110-restore-names/test.sh) (`output.txt`). Docker daemon not available; grammar checked by regex, not by `docker tag`.
+- Unverified: all output formats and numbers (illustrative by design).

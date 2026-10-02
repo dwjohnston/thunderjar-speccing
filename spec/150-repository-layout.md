@@ -80,3 +80,8 @@ Because both come from the same script, a branch restored from a fixture image s
 - **Post-run fixtures: hand-written or generated?** A hand-written Dockerfile can drift from what the real pipeline produces. The alternative is for the prepare step to produce post-run fixtures by running the real pipeline with the fake harness on `prerun-basic`.
 - **Should `prerun-basic` be a Dockerfile at all?** Thunderjar generates prerun images from configuration, so the prepare step could generate this one from a fixture project. That makes the prepare step depend on the code under test.
 - **More fixture images.** Likely candidates: a post-run image with a malformed harness result, and one with untracked or gitignored files.
+
+## Verification
+
+- Fixed authors and dates give identical commit hashes across separate repositories (git 2.43): [demo](../scratchpad/verification/150-seed-repo-determinism/test.sh), [output](../scratchpad/verification/150-seed-repo-determinism/output.txt). Uses `GIT_AUTHOR_*` / `GIT_COMMITTER_*` env vars ([git docs](https://git-scm.com/docs/git-commit#_commit_information)).
+- Not verified: Docker build behaviour of the fixture Dockerfiles (no daemon available). The rest of the page is design.

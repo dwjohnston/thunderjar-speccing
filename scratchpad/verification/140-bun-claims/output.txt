@@ -1,0 +1,15 @@
+bun 1.3.14
+--- run ts directly (no build step)
+sqlite: [{"x":42}]
+sha256 key-order-sensitive: differs
+spawn: git version 2.43.0
+--- bun build
+Bundled 1 module in 7ms
+
+  index.js  0.66 KB  (entry point)
+
+index.js
+--- any .d.ts emitted by bun build?
+0
+--- type errors: bun run does not check
+ran despite type error
