@@ -33,12 +33,12 @@ my-app/
     │   │   │   └── index.ts               # declarePromptSet(...)
     │   │   └── glurk/
     │   │       └── index.ts
-    │   ├── harnesses/
-    │   │   └── claude-code-2-1-283/
-    │   │       └── index.ts               # declareHarness(...)
-    │   ├── models/
-    │   │   └── haiku-4-5/
-    │   │       └── index.ts               # declareModel(...)
+    │   ├── harnessModels/
+    │   │   └── claude-code/               # family; yields multiple pairs
+    │   │       ├── index.ts               # declareHarness(...): shared execution
+    │   │       ├── models.ts              # declareHarnessModels(...): name → ID
+    │   │       ├── versions.ts            # declareHarnessVersions(...): version + overrides
+    │   │       └── collectTokenCosts.ts   # declareTokenCostCollector(...): interpretation
     │   └── tasks/
     │       └── is-prime/
     │           ├── initial-prompts/
@@ -50,7 +50,7 @@ my-app/
     │               ├── isPrimeTemplateTest.ts
     │               └── isPrime.test.template.ts
     └── _generated/
-        └── parameter-names.d.ts           # generated from the folders above; git-ignored
+        └── parameter-names.d.ts           # generated from names and family maps above; git-ignored
 ```
 
 ## What lives where
@@ -58,9 +58,15 @@ my-app/
 - **The user's own files stay where they are.** Code and prompt files live in the normal
   project tree. Code state and prompt set declarations point at them by pinned commit
   rather than copying them into `thunderjar/`.
-- **One folder per parameter**, under `experiment-parameters/<kind>/<name>/`. The folder
-  name is the parameter's name; its content — `index.ts` plus anything bundled — is its
-  parameter hash.
+- **One folder per base image, code state or prompt set**, under its kind folder. Its
+  name selects it; its content — `index.ts` plus bundled files — determines its hash.
+- **One folder per harness family**, under `experiment-parameters/harnessModels/`.
+  Version and model maps yield values addressed as `family@version/model`, such as
+  `claude-code@2.1.283/haiku-4-5`. The [family declaration](064-harness.md#family-declaration)
+  defines these files; [pair hashing](064-harness.md#hashing) uses shared execution
+  content and only the selected map entries.
+  _(Referenced by: [030-terminology.md](030-terminology.md),
+  [004-addressing-harness-model-pair.md](004-addressing-harness-model-pair.md).)_
 - **A task folder holds the task's initial prompts and its measurements.** The folder
   name is the task. `initial-prompts/` has one file per wording, and each is an
   experiment parameter value, hashed on its own. `measurements/` holds the task

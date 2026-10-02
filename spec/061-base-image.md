@@ -4,7 +4,7 @@ The image a permutation's prerun image is built `FROM`, before code state is app
 the base OS and runtime, plus any extra services a task needs (a database, a message
 broker) that code state, prompt set and harness don't provision themselves.
 
-One of the six experiment parameters. Hashing and `applyParameter` are common to all of
+One of the five experiment parameters. Hashing and `applyParameter` are common to all of
 them — see [060-experiment-parameters.md](060-experiment-parameters.md).
 
 ## Declaration

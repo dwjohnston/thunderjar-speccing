@@ -13,39 +13,31 @@ An **experiment** consists of a matrix of **experiment parameters** — the valu
 
 Associated with each task are its **task measurements**, which judge the outcome of a container run after the fact. They are not an experiment parameter: they don't inform what runs or how many permutations there are, and they aren't part of the permutation hash. They live alongside the task because they're only meaningful for it, and every initial prompt of the task is judged by the same ones — see [051-configuration-folder-structure.md](051-configuration-folder-structure.md).
 
-The experiment parameters are: **base image**, **code state**, **prompt set**, **harness**, **model**, and **initial prompt**. The task itself is named once per experiment and is not varied.
+The experiment parameters are: **base image**, **code state**, **prompt set**, **harness/model pair**, and **initial prompt**. The task itself is named once per experiment and is not varied.
 
 ### Experiment parameters
 
-Each of these six values is defined deterministically — if the content does not change, neither should its effect on the experiment run. Do not make API calls or other non-deterministic operations in parameter definitions.
+Each of these five values is defined deterministically — if the content does not change, neither should its effect on the experiment run. Do not make API calls or other non-deterministic operations in parameter definitions.
 
-A parameter is not just the plain value shown in the **Example** column below — that's shorthand. Each parameter is a named folder under `experiment-parameters/`, one subfolder per kind, containing at minimum an `index.ts` whose (deterministic) output is the actual value. A folder rather than a bare file, so a definition can bundle scripts, templates, or fixtures alongside it as needs grow, without changing the shape of the system:
+Base image, code state and prompt set values each have a named folder with an
+`index.ts` and optional bundled files. Initial prompts are individual files within a
+task. A harness/model pair selects values from a family folder's version and model maps;
+one folder yields many pairs. See
+[051-configuration-folder-structure.md](051-configuration-folder-structure.md).
 
 ```
 experiment-parameters/
-  baseImages/
-    node20/
-      index.ts
-  codeStates/
-    baseline/
-      index.ts
-  promptSets/
-    snerk/
-      index.ts
-    glurk/
-      index.ts
-  harnesses/
-    claude-code/
-      index.ts
-  models/
-    haiku/
-      index.ts
-  tasks/
-    add-function/
-      index.ts
-      initial-prompts/
-        plain.ts
-      measurements/
+  baseImages/node20/index.ts
+  codeStates/baseline/index.ts
+  promptSets/snerk/index.ts
+  harnessModels/claude-code/
+    index.ts
+    models.ts
+    versions.ts
+    collectTokenCosts.ts
+  tasks/add-function/
+    initial-prompts/plain.ts
+    measurements/
 ```
 
 | Term | Definition | Example |
@@ -53,21 +45,22 @@ experiment-parameters/
 | **Base image** | The image a permutation's prerun image is built `FROM`, before code state is applied — base OS/runtime plus any extra services a task needs (a database, a message broker) that code state, prompt set, or harness don't provision. Most experiments just use one plain, minimal base image. | `baseImages/node20` → `FROM node:20-bookworm` |
 | **Code state** | The codebase the container starts from, applied on top of the base image — a git commit from the user's repository, plus any setup it needs (installing dependencies, seeding fixtures). See [062-code-state.md](062-code-state.md). | `codeStates/baseline` → commit `a1b2c3`, then `npm ci` |
 | **Prompt set** | The prompt files overlaid into the worktree (`CLAUDE.md`, skills, rules), read from a pinned commit. | `promptSets/snerk` → `prompts/snerk.md` at `e4f5a6`, as `CLAUDE.md` |
-| **Harness** | An agent tool and how to invoke it headlessly, pinned to an exact version. Comparing two versions means comparing two harnesses. | `harnesses/claude-code` → pinned to version X |
-| **Model** | The root LLM used by the harness. Sub-agent models are recorded as outcomes, not controlled parameters. | `models/haiku` → `claude-haiku-4-5-20251001` |
+| **Harness/model pair** | One parameter selecting a harness family, resolved version and root model. See [064-harness.md](064-harness.md#addressing-a-pair). | `claude-code@2.1.283/haiku-4-5` |
+| **Harness family** | Shared installation, invocation and collection logic with version and model maps; not itself a parameter value. | `harnessModels/claude-code/` |
+| **Model** | The root LLM selected within the pair, with a harness-specific ID. Sub-agent models are outcomes. | `haiku-4-5` → `claude-haiku-4-5-20251001` |
 | **Task** | The goal an experiment is about, with its initial prompts and the task measurements that judge it. An experiment names exactly one, so every result in it is judged by the same measurements. Not a varied parameter. | `tasks/add-function` |
 | **Initial prompt** | The first prompt given to the harness — what the agent is asked to do. One of several wordings a task can have. Distinct from prompt set, which shapes the environment. Called *task instruction* in earlier drafts and in the source conversation. | `tasks/add-function/initial-prompts/plain.ts` → "Write a TypeScript function called `add`…" |
 
 ### Declaration
 
-A **declaration** is the file that determines an experiment parameter — the `index.ts`
-inside that parameter's folder, plus anything it bundles. "Base image" names the
-parameter; `baseImages/node20/index.ts` is its declaration.
+A **declaration** defines an experiment parameter. Base image, code state and prompt
+set declarations are `index.ts` plus bundled files; an initial prompt has its own file.
+For a harness/model pair, the declaration is the family's shared execution definition
+plus its selected version and model entries — see
+[064-harness.md](064-harness.md#family-declaration).
 
-Every declaration exposes an `applyParameter()` function, which returns the Dockerfile
-fragment that contributes that parameter to the prerun image. Some declarations carry
-more: a harness declaration also says how to invoke the tool and how to read its token
-costs back afterwards. See
+Each resolved parameter exposes `applyParameter()`, which returns its contribution to
+the prerun Dockerfile. A harness family also defines how to invoke the tool. See
 [060-experiment-parameters.md](060-experiment-parameters.md#declarations-and-applyparameter).
 
 ### Parameter hash
@@ -76,18 +69,19 @@ Each experiment parameter has its own **parameter hash**:
 
 1. **Usually it is taken from the content of the parameter's declaration folder** —
    `index.ts` plus anything bundled alongside it.
-2. **Some exclusions apply.** For example A task's `measurements/` folder and a harness's `models`
-   map are left out, because changing them doesn't change what runs.
-3. **A declaration can set the value itself**, with `additionalHash` or `determineHash`
-   — see [Floating parameter](#floating-parameter).
+2. **Some exclusions apply.** Task measurements do not affect execution identity.
+   A [pair hash](064-harness.md#hashing) combines shared execution content, the selected
+   version's execution overrides with its resolved version, and the selected model ID.
+   Other map entries and the token-cost collector do not contribute.
+3. **Other parameter declarations can set the value themselves**, with `additionalHash`
+   or `determineHash` — see [Floating parameter](#floating-parameter).
 
 ### Permutation hash
 
-A permutation's **permutation hash** combines the parameter hashes of its six parameters
-(base image, code state, prompt set, harness, model, initial prompt), plus the model ID the
-harness resolves the model to. This hash tags the permutation's prerun and postrun
-images and proves two container runs are comparable — if any parameter hash
-changes, the permutation hash changes, so two runs are only directly comparable if they
+A permutation's **permutation hash** combines the parameter hashes of its five parameters
+(base image, code state, prompt set, harness/model pair, initial prompt). This hash tags
+the permutation's prerun and postrun images and proves two container runs are comparable:
+if any parameter hash changes, the permutation hash changes, so two runs are only directly comparable if they
 share the same hash. See
 [060-experiment-parameters.md](060-experiment-parameters.md#parameter-hashing-and-identity).
 
@@ -100,6 +94,10 @@ each experiment execution, whose output replaces the folder's content as the sou
 its parameter hash. When the target has moved, the parameter hash changes, so the
 permutation hash changes too.
 
+For a harness/model pair, version resolution replaces only the version value; shared
+execution content, version overrides and model ID remain hashed. See
+[064-harness.md](064-harness.md#versions-and-overrides).
+
 A floating parameter is still deterministic. The value may differ from one execution to
 the next, but any one resolved value must always mean the same thing: the same commit
 SHA is always the same codebase. The command should not make API calls or read anything
@@ -108,18 +106,22 @@ else that could give two answers for the same state. See
 
 ### Permutation
 
-A **permutation** is one specific combination of experiment parameter values. An experiment with matrix shape `1/1/2/1/1/1` (2 prompt sets, everything else fixed) produces 2 permutations.
+A **permutation** is one specific combination of experiment parameter values. An experiment with matrix shape `1/1/2/1/1` (2 prompt sets, everything else fixed) produces 2 permutations.
 
 ### Matrix shape
 
 Shorthand for the size of an experiment's parameter matrix, written
-`<base images>/<code states>/<prompt sets>/<harnesses>/<models>/<initial prompts>` —
-one count per experiment parameter, in the same order as the parameter table above. The
-product of the six counts is the number of permutations. E.g. `1/1/2/1/1/1` is 1 base
-image, 1 code state, 2 prompt sets, 1 harness, 1 model, 1 initial prompt — 2
-permutations.
+`<base images>/<code states>/<prompt sets>/<harness-model pairs>/<initial prompts>`.
 
-A matrix shape of `1/1/1/1/1/1` — every axis fixed to a single value — is a
+```
+1/1/2/1/1
+```
+
+One count per parameter, in the order above. Their product is the number of permutations:
+the example has 1 base image, 1 code state, 2 prompt sets, 1 harness/model pair and
+1 initial prompt — 2 permutations.
+
+A matrix shape of `1/1/1/1/1` — every axis fixed to a single value — is a
 **single-permutation experiment**: exactly one permutation, so repeated container runs
 come only from iteration, not from the matrix.
 
@@ -136,8 +138,8 @@ applied, prompt set overlaid, harness installed and pinned — everything from
 **Initial setup** below, before the harness is invoked. Tagged `prerun-h<permutation hash>`
 — see [081-docker-tagging.md](081-docker-tagging.md) for the full tag scheme.
 
-One permutation always maps to one prerun image, even for parameters (like model) that
-don't actually change the filesystem — simpler than special-casing which parameters
+One permutation always maps to one prerun image, even when pairs differ only by model and
+therefore share the same filesystem — simpler than special-casing which parameters
 affect the image. Content-addressed, so it's built once and reused as the starting point
 for every iteration of that permutation, and reused again if the same permutation (same
 permutation hash) runs again later, e.g. a pinned experiment's weekly rerun, rather than

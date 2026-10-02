@@ -3,7 +3,7 @@
 A named, reusable action that overlays prompt files (`CLAUDE.md`, skills, rules) into
 the worktree before the harness runs.
 
-One of the six experiment parameters. Hashing and `applyParameter` are common to all of
+One of the five experiment parameters. Hashing and `applyParameter` are common to all of
 them — see [060-experiment-parameters.md](060-experiment-parameters.md).
 
 ## Declaration

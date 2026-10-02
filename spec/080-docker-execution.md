@@ -19,7 +19,7 @@ flowchart TD
         C -- No --> E["Start FROM base image<br/>(experiment parameter)"]
         E --> F["Clone code state's commit<br/>to /workspace, run its setup"]
         F --> G["Overlay prompt set files"]
-        G --> H["Install harness,<br/>pinned to its version"]
+        G --> H["Install harness,<br/>at the pair's resolved version"]
         H --> I["Tag as prerun image,<br/>push to image store"]
         D --> J["Prerun image ready"]
         I --> J
@@ -27,7 +27,7 @@ flowchart TD
 
     subgraph ITER["Per iteration"]
         K["Run a new container<br/>from the prerun image"]
-        K --> L["Execution: harness invoked headlessly<br/>with initial prompt + model, inside<br/>Thunderjar's execution wrapper"]
+        K --> L["Execution: harness invoked headlessly<br/>with initial prompt + resolved pair, inside<br/>Thunderjar's execution wrapper"]
         L --> M["docker commit the container<br/>into a postrun image"]
         M --> N["Tag as postrun image,<br/>push to image store"]
         N --> O["Measurement: start a short-lived measurement<br/>container from the postrun image, apply the<br/>task's measurements, then discard it"]
@@ -99,7 +99,7 @@ the run. _(Referenced by: [085-experiment-results.md](085-experiment-results.md#
 
 ## Open questions
 
-- **Thunderjar's own injected setup.** Beyond the six experiment parameters, Thunderjar
+- **Thunderjar's own injected setup.** Beyond the five experiment parameters, Thunderjar
   itself may need to bake things into the image that aren't any experimenter's concern —
   e.g. OTel collector config or other instrumentation needed for telemetry. Where this
   fits in the Initial Setup sequence (part of the base image? its own step? applied to

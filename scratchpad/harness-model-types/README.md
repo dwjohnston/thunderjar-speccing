@@ -1,15 +1,14 @@
-# harness-model-types
+# Harness/model pair types
 
-To install dependencies:
+A small type-checking demo of the pair union described in
+[Declaring Experiments](../../spec/055-declaring-experiments.md#typed-pairs).
+It accepts mixed families, versions and models in one experiment and rejects unknown
+families, versions, models, incomplete pairs and separate harness/model arrays.
 
-```bash
+```sh
 bun install
+bunx --bun tsc --noEmit
 ```
 
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.3.14. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+Each `@ts-expect-error` verifies a rejected declaration. Removing a required type error
+makes the type check fail.

@@ -1,50 +1,40 @@
 # Model
 
-The root LLM the harness is invoked with.
+The root LLM selected within a [harness/model pair](064-harness.md#addressing-a-pair).
+Model values live in each harness family's `models.ts`, alongside its version map;
+see [064-harness.md](064-harness.md#family-declaration).
 
-One of the six experiment parameters. Hashing and `applyParameter` are common to all of
-them — see [060-experiment-parameters.md](060-experiment-parameters.md).
+## Harness-specific IDs
 
-## Declaration
-
-Lives at `experiment-parameters/models/<name>/index.ts`.
+Each family explicitly maps model names to the IDs its CLI accepts. A model name is
+local to that family; there is no central model declaration.
 
 ```ts
-// experiment-parameters/models/haiku-4-5/index.ts
-export default declareModel({
-  applyParameter: () => ``,
+// experiment-parameters/harnessModels/claude-code/models.ts
+export default declareHarnessModels({
+  "haiku-4-5": "claude-haiku-4-5-20251001",
 });
 ```
 
-| Field | What it is |
-|---|---|
-| `applyParameter` | Returns an empty string. A model adds nothing to the image. |
-
-## Identity
-
-The folder name is the model's identity: `haiku-4-5` above. It is the name an
-experiment lists, and the key harnesses use in their `models` map.
-
-## The model ID belongs to the harness
-
-The ID passed on the command line is not declared here. Harnesses spell the same model
-differently, so each harness declares its own ID for each model it runs, in its
-[`models` map](064-harness.md#models-which-models-it-runs):
-
 ```ts
-// experiment-parameters/harnesses/claude-code-2-1-283/index.ts
-  models: { "haiku-4-5": "claude-haiku-4-5-20251001" },
+// experiment-parameters/harnessModels/opencode/models.ts
+export default declareHarnessModels({
+  "haiku-4-5": "anthropic/claude-haiku-4-5-20251001",
+});
 ```
 
-A model can be used with a harness only if that harness lists it. An experiment that
-pairs a model with a harness that doesn't list it is a type error — see
-[055-declaring-experiments.md](055-declaring-experiments.md#harness-and-model-must-be-compatible).
+An experiment selects a complete pair, such as `claude-code@2.1.283/haiku-4-5`.
+The resolved ID reaches `cli` as `ctx.modelId` — see
+[064-harness.md](064-harness.md#cli-running-the-agent). The model ID contributes to
+the pair hash; model names do not determine execution identity.
+_(Referenced by: [064-harness.md](064-harness.md#family-declaration),
+[060-experiment-parameters.md](060-experiment-parameters.md),
+[004-addressing-harness-model-pair.md](004-addressing-harness-model-pair.md).)_
 
-## When it applies
-
-Run time only. The harness's `cli` receives the resolved ID as `ctx.modelId`.
+**Future:** a central model catalogue with per-family ID transformations. See
+[020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1).
 
 ## Sub-agent models
 
-Sub-agent models aren't controlled here. They're recorded as outcomes, in the per-model
-breakdown of [087-collecting-token-costs.md](087-collecting-token-costs.md).
+The pair controls the root model. Sub-agent models are recorded as outcomes, in the
+per-model breakdown of [087-collecting-token-costs.md](087-collecting-token-costs.md).

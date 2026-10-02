@@ -3,7 +3,7 @@
 The codebase applied on top of the base image: a git commit from the user's repository,
 plus any setup the codebase needs before the agent starts.
 
-One of the six experiment parameters. Hashing and `applyParameter` are common to all of
+One of the five experiment parameters. Hashing and `applyParameter` are common to all of
 them — see [060-experiment-parameters.md](060-experiment-parameters.md).
 
 ## Declaration

@@ -15,7 +15,8 @@ Thunderjar is published as a single npm package, `thunderjar`. It serves two rol
    `#!/usr/bin/env bun`.
 2. **The library.** Its exports are the `declareX()` functions the user's
    configuration imports: `declareConfig`, `declareExperiment`, `declareHarness`,
-   `sqliteStore` and so on, following [022-coding-conventions.md](022-coding-conventions.md).
+   the family map and collector helpers, `sqliteStore` and so on, following
+   [022-coding-conventions.md](022-coding-conventions.md).
 
 Both come from one package so the CLI version and the `declareX()` imports can never
 differ. Splitting them would only pay off if the library were light and the CLI heavy,

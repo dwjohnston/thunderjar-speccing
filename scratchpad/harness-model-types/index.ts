@@ -1,90 +1,63 @@
-// Demo: invalid harness × model combinations are a type error.
-// Run: bunx tsc --noEmit
-// Every `@ts-expect-error` line below is a real type error. If any of them
-// stopped erroring, tsc would fail with "Unused '@ts-expect-error' directive".
+// Demo: complete harness/model pair strings are type checked independently.
+// Run: bunx --bun tsc --noEmit
+// Each @ts-expect-error must correspond to a real error or tsc fails.
 
-// ---------------------------------------------------------------------------
-// _generated/ — what the type generator would emit from the harness folders'
-// `models` maps.
-// ---------------------------------------------------------------------------
+// Generated from each family's versions.ts and models.ts.
+type HarnessModelName =
+  | `claude-code@${"2.1.283" | "2.2.0"}/${"haiku-4-5" | "sonnet-5-5"}`
+  | `codex@${"0.9.0"}/${"gpt-luna"}`;
 
-type HarnessModels = {
-    "claude-code-123": "sonnet-5.5" | "haiku-4.5";
-    "opencode-123": "sonnet-5.5" | "gpt-5" | "haiku-4.5";
-};
-
-type HarnessName = keyof HarnessModels;
-
-// ---------------------------------------------------------------------------
-// Option: cross product — two arrays, every combination must be valid.
-// The allowed models are the ones that *every* listed harness can run.
-// ---------------------------------------------------------------------------
-
-type ModelName = HarnessModels[HarnessName];
-
-// The harnesses that can run model M.
-type HarnessesFor<M extends ModelName> = {
-    [H in HarnessName]: M extends HarnessModels[H] ? H : never;
-}[HarnessName];
-
-// The models every harness in H can run.
-type ModelsForAll<H extends HarnessName> = {
-    [M in ModelName]: [H] extends [HarnessesFor<M>] ? M : never;
-}[ModelName];
-
-function declareExperiment<
-    const H extends readonly HarnessName[],
-    const M extends readonly ModelsForAll<H[number]>[],
->(config: { harness: H; model: M }) {
-    return config;
+function declareExperiment(config: { harnessModel: HarnessModelName[] }) {
+  return config;
 }
 
-
-
-// 👇 This is the chosen method. 
-// OK: Claude Code can run both models.
+// Mixed families, versions and models belong to the same experiment.
 declareExperiment({
-    harness: ["claude-code-123"],
-    model: ["sonnet-5.5", "haiku-4.5"],
+  harnessModel: [
+    "claude-code@2.1.283/haiku-4-5",
+    "claude-code@2.2.0/haiku-4-5",
+    "codex@0.9.0/gpt-luna",
+  ],
 });
 
-// OK: Sonnet runs on both harnesses.
+// Every declared version/model combination within a family is selectable.
 declareExperiment({
-    harness: ["claude-code-123", "opencode-123"],
-    model: ["sonnet-5.5"],
+  harnessModel: [
+    "claude-code@2.1.283/sonnet-5-5",
+    "claude-code@2.2.0/sonnet-5-5",
+  ],
 });
 
 declareExperiment({
-    harness: ["claude-code-123", "opencode-123"],
-
-    //@ts-expect-error
-    model: ["sonnet-5.5", "gpt-5"],
+  harnessModel: [
+    // @ts-expect-error — model absent from this family
+    "claude-code@2.1.283/gpt-luna",
+  ],
 });
 
-// ---------------------------------------------------------------------------
-// Option: pairs — each harness/model pair checked on its own.
-// ---------------------------------------------------------------------------
-
-type Agent = {
-    [H in HarnessName]: { harness: H; model: HarnessModels[H] };
-}[HarnessName];
-
-function declareExperimentPairs(config: { agents: Agent[] }) {
-    return config;
-}
-
-// OK: the mixed experiment the cross product can't express.
-declareExperimentPairs({
-    agents: [
-        { harness: "claude-code-123", model: "sonnet-5.5" },
-        { harness: "opencode-123", model: "sonnet-5.5" },
-        { harness: "opencode-123", model: "gpt-5" },
-    ],
+declareExperiment({
+  harnessModel: [
+    // @ts-expect-error — version absent from this family
+    "claude-code@9.9.9/haiku-4-5",
+  ],
 });
 
-declareExperimentPairs({
-    agents: [
-        // @ts-expect-error — claude-code-123 + gpt-5 can't run
-        { harness: "claude-code-123", model: "gpt-5" },
-    ],
+declareExperiment({
+  harnessModel: [
+    // @ts-expect-error — family absent
+    "unknown@0.9.0/gpt-luna",
+  ],
+});
+
+declareExperiment({
+  harnessModel: [
+    // @ts-expect-error — incomplete pair
+    "claude-code@2.1.283",
+  ],
+});
+
+declareExperiment({
+  // @ts-expect-error — separate harness/model arrays are not experiment axes
+  harness: ["claude-code"],
+  model: ["haiku-4-5"],
 });
