@@ -1,0 +1,12 @@
+# claude --version: 2.1.287 (Claude Code)
+# payload.json = real output of: claude -p hi --output-format json (session_id/uuid redacted)
+## top-level keys
+api_error_status duration_api_ms duration_ms fast_mode_disabled_reason fast_mode_state first_content_frame_ms is_error modelUsage num_turns permission_denials queued_turn_count result result_index session_id stop_reason subagent_stats subtype terminal_reason time_to_request_ms total_cost_usd ttft_ms ttft_stream_ms type usage uuid
+## flat usage keys (snake_case?)
+cache_creation cache_creation_input_tokens cache_read_input_tokens fallback_credit inference_geo input_tokens iterations output_tokens output_tokens_details server_tool_use service_tier speed
+## modelUsage entry keys (camelCase?)
+cacheCreationInputTokens cacheReadInputTokens canonicalModel contextWindow costBasis costUSD inputTokens maxOutputTokens outputTokens provider thinkingTokens webSearchRequests
+## cost/duration/basis
+{"total_cost_usd":0.0032228,"duration_api_ms":1331,"costBasis":["list"]}
+## spec's 4 buckets: flat usage vs modelUsage
+{"flat":{"input_tokens":2,"output_tokens":13,"cache_creation_input_tokens":0,"cache_read_input_tokens":15444},"perModel":{"inputTokens":2,"outputTokens":13,"cacheCreationInputTokens":0,"cacheReadInputTokens":15444}}
