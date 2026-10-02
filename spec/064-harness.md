@@ -86,11 +86,18 @@ contract and what happens when the file is missing or malformed.
 
 The harness declares the names of the environment variables its agent needs. The user
 exports them in the shell (or CI secret store) that runs Thunderjar, and Thunderjar
-passes exactly those names into that harness's containers, as `docker run -e NAME`.
-Docker copies the value from the calling environment.
+passes exactly those names into that harness's containers, through a mounted file that
+the execution wrapper loads. Never as `docker run -e`, which `docker commit` would
+preserve in the postrun image. See
+[082-keeping-secrets-secret.md](082-keeping-secrets-secret.md).
 
-- **Names only.** Values never appear in the declaration, the image layers, the run data
-  store or any hash. They exist only in the container's environment at run time.
+- **Names only.** Values never appear in the declaration, the image config or layers, the
+  run data store or any hash. They exist only in the harness process's environment at run
+  time.
+- **Not written to disk by the tool.** `cli` must invoke the tool so that it reads its
+  credentials from the environment and does not persist them, since the postrun image
+  keeps whatever the tool wrote. See
+  [082-keeping-secrets-secret.md](082-keeping-secrets-secret.md#the-harness-must-not-persist-credentials).
 - **Scoped to the harness.** A container sees only its own harness's variables, so a run
   of one harness never receives another's key.
 - **Fails fast.** `plan` and `run` stop before building anything if a required variable

@@ -44,6 +44,12 @@ What's in scope vs. explicitly not.
   in the prompt cache question under "To revisit". (See
   [050-setup-and-configure.md](050-setup-and-configure.md#thunderjarconfigts).)
 
+- **Harnesses that authenticate from a stored credential file.** A tool that can only log
+  in through a persisted file (an OAuth login state, say) rather than an environment
+  variable would leave that file in the postrun image. v1 supports environment-variable
+  credentials only. (See
+  [082-keeping-secrets-secret.md](082-keeping-secrets-secret.md#the-harness-must-not-persist-credentials).)
+
 - **Experiments in a different repository from the code.** Thunderjar reads commits from
   the repository it runs in, so `thunderjar/` lives in the same repository as the code it
   experiments on. A setting pointing at another repository is deferred. (See

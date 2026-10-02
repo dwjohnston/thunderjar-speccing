@@ -27,6 +27,7 @@ project glossary before diving into the rest.
 7.1. [Data Persistence](071-data-persistence.md) — Open questions about how the run data store is kept and shared across machines.
 8. [Docker Execution](080-docker-execution.md) — The Docker run mechanics and resulting artifacts.
 8.1. [Docker Tagging](081-docker-tagging.md) — The prerun/postrun image tag formats, and why.
+8.2. [Keeping Secrets Secret](082-keeping-secrets-secret.md) — How a harness's credentials reach the container without reaching the postrun image: a mounted file, not `docker run -e`.
 8.5. [Experiment Results](085-experiment-results.md) — What gets recorded to the run data store after a container run.
 8.7. [Collecting Token Costs](087-collecting-token-costs.md) — How a container run's token usage and cost are obtained from the harness, normalised across harnesses, and recorded.
 9. [Restore / Purge](090-restore-purge.md) — Lifecycle management: restoring a container from a preserved postrun image, purging old ones.

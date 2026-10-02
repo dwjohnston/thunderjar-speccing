@@ -75,12 +75,17 @@ At `L`, Thunderjar doesn't run the harness's `cli` command directly. It wraps it
 the container, to record when the agent started, when it finished, and how it exited:
 
 ```sh
+set -a; . /run/thunderjar/env; set +a
 start=$(date +%s%3N)
 <command returned by the harness's cli>
 code=$?
 end=$(date +%s%3N)
 echo "{\"startedAt\":$start,\"finishedAt\":$end,\"exitCode\":$code}" > /thunderjar/run.json
 ```
+
+The first line loads the harness's credentials from a mounted file into the harness
+process's environment, so they never enter the container's config and so never reach the
+postrun image. See [082-keeping-secrets-secret.md](082-keeping-secrets-secret.md).
 
 ```json
 { "startedAt": 1790692255104, "finishedAt": 1790692297416, "exitCode": 0 }
