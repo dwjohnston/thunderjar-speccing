@@ -9,6 +9,8 @@ Glossary of project-specific terms, used consistently across all other spec page
 
 An **experiment** consists of a matrix of **experiment parameters** — the values that determine what happened and from what state, and whose combinations produce permutations. One of those parameters is the **initial prompt**: the first prompt given to the harness, i.e. what the agent is asked to do. An experiment is about one **task**: the goal its initial prompts ask for, together with the measurements that judge it.
 
+**Test case** is a synonym for experiment; the spec uses *experiment*.
+
 🙋‍♂️ Really an experiment is the 6 parameters + and then task measurements occur afterwards. 
 
 Associated with each task are its **task measurements**, which judge the outcome of a container run after the fact. They are not an experiment parameter: they don't inform what runs or how many permutations there are, and they aren't part of the permutation hash. They live alongside the task because they're only meaningful for it, and every initial prompt of the task is judged by the same ones — see [051-configuration-folder-structure.md](051-configuration-folder-structure.md).
@@ -218,10 +220,3 @@ An **aggregation result** combines the Results of every iteration of one permuta
 viewing one doesn't need a full image pull. See
 [020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1).
 
-## Open questions and notes, things not to forget
-
-- **Container run metadata vs. measurements:** What should we call the aggregate of measurements produced by one container run? Candidate: "container run result" or "container run snapshot".
-- **Run data store clarity:** Should this have a more specific name? (e.g., "metadata store", "result store")
-- Still need to include the concept of measurements 
-- The concept that we can later reapply new measurements against previous runs, without having to actually rerun them. 
-- The concept of comparing runs over time. It's fine if the the parameters and the measurments are the same, but sometimes we might still want to compare against changing parameters, or with new measurements. 

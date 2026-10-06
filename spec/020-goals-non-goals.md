@@ -58,6 +58,12 @@ What's in scope vs. explicitly not.
   commit its parameters name, and fails if one is missing rather than fetching it. (See
   [062-code-state.md](062-code-state.md#where-the-commit-comes-from).)
 
+- **Docker-in-Docker.** Agent tasks that need to run Docker themselves, inside the
+  execution container, are unsupported. The container run is a plain container with no
+  access to a Docker daemon. (See
+  [080-docker-execution.md](080-docker-execution.md#process).)
+  _(Referenced by: [080-docker-execution.md](080-docker-execution.md#process).)_
+
 ## To revisit
 
 Unresolved, but things we *are* intending to address in v1 — unlike the non-goals above.

@@ -221,11 +221,3 @@ Run from inside a git repository. Fetches the run's end state and creates the br
   configuration folder.
 - **`purge`.** See [090-restore-purge.md](090-restore-purge.md#purge).
 
-## Open questions
-
-- **`compare` as its own command.** It may be a mode of `show`, for example
-  `show <a> --against <b>`.
-- **`executions` as its own command.** It may be unnecessary if `show` with no argument
-  lists recent executions.
-- **Narrowing a `run`.** Whether and how to run a subset of permutations.
-- **Exit codes.** The exact values, and what counts as a regression.

@@ -126,29 +126,3 @@ re-serialises it, is open below.
   folders where no file is allowed (everything under `src/` that no layout entry covers). A
   file there is then a lint error with a message naming the layout page.
 
-## Open questions
-
-- **Does the "wrong place" plugin work?** It relies on a plugin scoped by `includes` firing
-  once per file. Biome's plugin documentation says nothing about matching a file path inside a
-  pattern, so scoping is the only lever. Needs a spike before this is relied on.
-- **Which rules apply.** Which folders get an import restriction, and whether non-source
-  folders (`scripts/`, `test/fixtures/`) are covered at all. See also
-  [150-repository-layout.md](150-repository-layout.md#open-questions).
-- **Editing `biome.json`.** Textual replacement between markers keeps comments and hand-written
-  formatting. Parse and re-serialise is simpler but loses comments.
-- **Where the layout data lives.** `scripts/layout.ts` as above, or derived from a tree in
-  [150-repository-layout.md](150-repository-layout.md) so the spec and the lint rules
-  can't disagree.
-- **Biome version.** Plugins and `overrides` behaviour have changed between major versions;
-  pin an exact version, as for Bun.
-- **Which tests run in CI.** Pull requests run `bun test`; whether that includes the Docker
-  image tests (layer 3) is open in
-  [120-test-boundaries.md](120-test-boundaries.md#open-questions), as is the smoke test's
-  trigger. Fixture images would need building on the runner, or pulling.
-- **Where the docs source lives.** VitePress reads from `docs/`, which in this repository
-  holds the design conversation. Whether the docs site is the pages in `spec/` or a separate
-  user-facing set is not decided, and neither is its place in
-  [150-repository-layout.md](150-repository-layout.md).
-- **Requiring a changeset.** Whether a pull request without one fails CI, or only warns.
-- **Commander confirmed?** Chosen on the strength of familiarity; nothing else in the spec
-  depends on it.

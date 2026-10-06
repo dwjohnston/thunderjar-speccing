@@ -101,20 +101,3 @@ The post-run image is the same kind of fixture 3.3 starts from: produced by the 
 
 None of the layers exercises a real harness talking to a real model. A small smoke test does, outside the layers. It is non-blocking because it is non-deterministic and costs money.
 
-## Open questions
-
-- **Which seams are injected?** Docker is settled. Git, registry, filesystem, clock and ID/randomness have been suggested, each with a real and a recording implementation.
-- **Stabilising stdout assertions.** Whether to normalise timestamps and temp paths before comparing, and how tightly to assert on flag ordering.
-- **Interactive rendering.** If the view-model is kept separate from rendering, what checks the thin rendering layer that is left?
-- **Is a single end-to-end run still wanted?** The three image tests each cover one step from a given starting state. An earlier idea was one run from a starting image all the way to the metadata report. Chaining 3.1 to 3.3 may make that redundant.
-- **Build or pull fixture images?** The prepare step can build them locally from checked-in Dockerfiles, or pull prebuilt ones from a registry. Building needs no registry; pulling is faster in CI.
-- **Stale fixture images.** If a fixture's definition changes, an old image with the same name still passes the existence check. Suggested: put a hash of the fixture's definition in its tag, so a changed fixture is a missing image.
-- **Shared history for restore.** The 3.4 fixture image holds a repository with fixed history, and the test's throwaway repository should share it. Suggested: one seed script, with fixed author and dates, creates the same initial commit in both.
-- **Fake harness failure modes.** Should it be parameterised to crash, time out, never commit, or emit a malformed result? Should a contract check confirm its output shape matches the real harnesses?
-- **How to inspect an image.** `docker run --rm <image> git log ...` versus exporting the filesystem. Either way, is there a helper that turns an image reference into a plain object for assertions?
-- **How far image assertions go.** Candidates beyond those listed: tag equals the parameter hash, absent files are absent (no host leakage, no credentials), base layers match the declared base image digest, metadata report matches the image.
-- **Instruments in layer 1 versus 3.3.** A unit-test instrument needs the runtime environment, not just files, so it cannot be tested as a pure function over a fixture directory. 3.3 may be where such instruments are tested, leaving layer 1 for file-only instruments.
-- **Registry push/pull.** Not a current concern. If it is tested, a throwaway local registry container is preferred over a mock.
-- **What blocks CI.** Only the smoke test is stated as non-blocking. Whether the Docker image tests (layer 3) run on every change or are tagged out of the fast loop is undecided.
-- **Smoke test trigger.** Manual or scheduled; no cadence or harness chosen.
-- **Not yet covered by any layer.** Backfill, trace extraction, hash-mismatch warnings, the run data store, per-environment config, and the `erroredWhileMeasuring` path.

@@ -147,10 +147,3 @@ A connection URL (`postgres://user:password@host/db`) is the one near-standard w
 authenticate to a remote database, and the `DATABASE_URL` convention. Cloud IAM tokens and
 secrets managers are later store constructors behind the same interface.
 
-## Open questions
-
-- Sharing the run data store between CI and a developer's machine. See
-  [071-data-persistence.md](071-data-persistence.md).
-
-- Harnesses whose required variables depend on the model's provider (Bedrock, Vertex).
-  v1 declares one harness family per provider.

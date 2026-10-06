@@ -85,10 +85,3 @@ The CLI has two modes over the same underlying engine:
   an iteration, triggering a restore. **Out of scope for the first pass**: see
   [020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1). Until then, local
   exploration uses the scriptable commands.
-
-## Open questions
-
-- Whether interactive mode is a dedicated TUI (e.g. `thunderjar explore`) or a set
-  of composable single-shot commands (e.g. `thunderjar show <execution-id>`).
-- What "promoting" a local run to canonical/CI status looks like, if that's a thing
-  at all.

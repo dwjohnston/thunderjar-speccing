@@ -344,12 +344,3 @@ the image and read them from its filesystem, same as everything else the run lef
 **Future:** a separate trace store, so viewing a trace doesn't need a full image pull —
 expected to be the first fast-follow after v1. See
 [020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1).
-
-## Open questions
-
-- **Comparing across a hash change.** The record stores full permutation hashes so a report
-  can decide what's comparable, but the policy is a reporting concern and belongs in
-  [110-cli-report-visualization.md](110-cli-report-visualization.md): when is it
-  legitimate to plot runs whose parameters differ, and how is that shown?
-- Whether the measurement context's shape is right — flagged in
-  [021-human-zone-out.md](021-human-zone-out.md) as not yet properly reviewed.

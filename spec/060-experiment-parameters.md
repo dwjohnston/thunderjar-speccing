@@ -305,21 +305,3 @@ pinned runtime and installed dependencies. Its value type is a count rather
 than a boolean — a measurement, not a verdict. The glob matching nothing gives
 `skipped`; a template that can't bind gives `erroredWhileMeasuring`.
 
-## Open questions
-
-- Hash algorithm, and exactly what gets hashed (file contents only, or also
-  file paths/structure?).
-- What happens when an `additionalHash` or `determineHash` command exits non-zero.
-- Whether the command's output is stored alongside the hash, so a report can show the
-  commit an execution resolved to rather than only its hash.
-- What else `applyParameter`'s `ctx` carries, beyond `resolvedHash` and the
-  harness/model pair's resolved `version` and `modelId`.
-- Imports from outside a declaration folder are not hashed. A change to such a helper
-  can change execution without changing the parameter hash.
-- Nothing stops a declaration returning a fragment that isn't reproducible
-  (`RUN apt-get install foo`). The prerun image being built once and reused
-  bounds the damage within a permutation's lifetime, but the hash can't detect
-  it.
-- Whether "artifact" should become the umbrella term for every hashed,
-  reusable definition (harness, prompt set, measuring instrument, code state)
-  — flagged in `030-terminology.md`, unresolved.

@@ -41,6 +41,9 @@ The per-permutation steps are the fold over each parameter's `applyParameter` fr
 in the order shown. _(Referenced by:
 [060-experiment-parameters.md](060-experiment-parameters.md#declarations-and-applyparameter).)_
 
+The container started at `K` has no Docker daemon, so a task can't have the agent run
+Docker itself. _(Referenced by: [020-goals-non-goals.md](020-goals-non-goals.md).)_
+
 What gets written to the run data store at `P`, and what's deliberately *not* extracted
 in v1 (the OTel trace and session transcript — pull the postrun image for those instead),
 is covered in [085-experiment-results.md](085-experiment-results.md).
@@ -97,11 +100,3 @@ and its duration changes every time measurements are backfilled, so it isn't a f
 the run. _(Referenced by: [085-experiment-results.md](085-experiment-results.md#execution),
 [064-harness.md](064-harness.md).)_
 
-## Open questions
-
-- **Thunderjar's own injected setup.** Beyond the five experiment parameters, Thunderjar
-  itself may need to bake things into the image that aren't any experimenter's concern —
-  e.g. OTel collector config or other instrumentation needed for telemetry. Where this
-  fits in the Initial Setup sequence (part of the base image? its own step? applied to
-  every prerun image regardless of permutation?) is unresolved. Revisit. (Also noted in
-  [020-goals-non-goals.md](020-goals-non-goals.md#to-revisit).)

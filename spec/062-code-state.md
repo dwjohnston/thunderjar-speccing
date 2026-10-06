@@ -123,11 +123,3 @@ state's fragment runs after that and before the prompt set's.
   Thunderjar fetching a missing commit itself. See
   [020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1).
 
-## Open questions
-
-- A parameter folder can bundle files, such as a fixture script, and they count toward
-  its parameter hash (see
-  [051-configuration-folder-structure.md](051-configuration-folder-structure.md)). How a
-  bundled file reaches the image build is not defined.
-- Bundling the commit's full history makes every prerun image carry it. Whether to limit
-  the depth, and how deep restore needs it to be.

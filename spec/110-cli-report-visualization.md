@@ -380,13 +380,3 @@ $ thunderjar restore postrun-e01KXXXXXXXXXXXXXXXXXXXXXX-h00000000-i00
 error: no postrun image found for postrun-e01KXXXXXXXXXXXXXXXXXXXXXX-h00000000-i00
 ```
 
-## Open questions
-
-- **Pairing permutations in `compare`** when hashes differ. The example above pairs by the
-  parameters that did not change. That is one proposal, not a decision.
-- **Judging "better" and "worse".** Whether a measurement needs a declared direction (higher is
-  better, lower is better) for `compare` to say so. The examples assume it does.
-- **Noise.** Whether `compare` shows any spread or significance across iterations, or only the
-  aggregate values.
-- **Terminal width.** How the tables degrade in narrow terminals and when many permutations are
-  shown.

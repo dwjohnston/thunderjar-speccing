@@ -106,7 +106,3 @@ _(Referenced by: [064-harness.md](064-harness.md#versions-and-overrides),
 [004-addressing-harness-model-pair.md](004-addressing-harness-model-pair.md),
 [110-cli-report-visualization.md](110-cli-report-visualization.md).)_
 
-## Open questions
-
-- When the generation step runs — on demand, in a watch mode, or as part of every
-  Thunderjar command.

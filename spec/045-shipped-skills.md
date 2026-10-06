@@ -52,13 +52,3 @@ request as its initial prompt in `initial-prompts/`, and the `measurements/` fol
 beside it. The experiment declaration and the other four parameters are left to the
 user.
 
-## Open questions
-
-- **"Test case" vs "experiment".** The skill's wording says *test case*; the rest of the
-  spec, including [030-terminology.md](030-terminology.md), still says *experiment*.
-  Unresolved which term the user-facing surface uses, and whether a test case is the task
-  plus its measurements or the whole experiment.
-- Whether the skill should also help create the experiment declaration, or stop at the
-  task.
-- Whether checking a measurement against the session's files is enough, or the skill
-  should run it in a [measurement container](030-terminology.md#measurement-container).

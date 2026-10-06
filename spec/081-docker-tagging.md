@@ -94,12 +94,3 @@ postrun-e01k5f2n0a7xrbq-h9d3e77a0-i00
 
 Both prerun images are reused as-is; only new postrun images are produced.
 
-## Open questions
-
-- **Human-readable execution ID?** Could `e<execution ID>` be a readable date/timestamp
-  (e.g. `e20260929-1430`) instead of an opaque ULID. Held back for now because of
-  collision risk: two executions starting close together — parallel local runs,
-  concurrent CI triggers — could land on the same tag and silently overwrite each
-  other's postrun images. A ULID's random component avoids that by construction; getting
-  the same safety from a date format would need enough extra precision/disambiguation
-  that it stops being more readable anyway.

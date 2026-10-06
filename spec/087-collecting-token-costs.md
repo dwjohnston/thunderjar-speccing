@@ -222,16 +222,3 @@ values must be stored with the run so floating entries and later map edits canno
 change interpretation context.
 _(Referenced by: [085-experiment-results.md](085-experiment-results.md).)_
 
-## Open questions
-
-- **Exact field names in each harness's payload.** The Claude Code field names above are
-  described from the Agent SDK's documented shape; the CLI's `--output-format json`
-  payload has not been captured and diffed against it, and may use different casing. Do
-  that before implementing a collector.
-- Whether the raw result file should *also* be stored verbatim in the run data store
-  alongside the parsed numbers. It is a few KB of text, and without it re-collecting
-  across a year of runs means pulling a year of images. It is explicitly not the OTel
-  trace or session transcript, so the v1 trace-store non-goal is untouched — but it is
-  the same shape of idea.
-- Whether `notReported` should distinguish "harness reports no usage" from "harness
-  reported zeros after a crash". They're recorded the same today.
