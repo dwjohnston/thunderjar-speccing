@@ -14,11 +14,8 @@ queryable, one large.
    separate repositories. See [081-docker-tagging.md](081-docker-tagging.md) for the tag
    scheme.
 
-A container run's OTel trace and session transcript live in its postrun image, alongside
-everything else the run left behind. To read them, pull the image.
-
-**Future:** a separate trace store, so viewing a trace or transcript doesn't need a full
-image pull. See [020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1).
+**Future:** OTel traces and session transcripts, and a trace store to hold them. See
+[020-goals-non-goals.md](020-goals-non-goals.md#soon-to-follow).
 
 ## Open questions
 

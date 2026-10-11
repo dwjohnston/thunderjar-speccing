@@ -194,9 +194,7 @@ bundled files count as execution content.
 | Edit `collectTokenCosts.ts` | None; token costs can be re-collected from preserved output. |
 
 A parser correction affects interpretation, so it does not change execution identity.
-Imports from outside the family folder are not covered by its content hash; the
-reproducibility limits in
-[060-experiment-parameters.md](060-experiment-parameters.md#open-questions) apply.
+Imports from outside the family folder are not covered by its content hash.
 _(Referenced by: [030-terminology.md](030-terminology.md),
 [060-experiment-parameters.md](060-experiment-parameters.md#parameter-hashing-and-identity),
 [087-collecting-token-costs.md](087-collecting-token-costs.md#backfilling-token-costs),

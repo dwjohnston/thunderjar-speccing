@@ -233,8 +233,7 @@ Restore with: thunderjar restore postrun-e01K4X9J2E8MQZ3V7R5T0WABCDE-h4f9a21c8-i
 ## `compare`
 
 Compares aggregation results. How they are matched up depends on whether the permutation
-hashes agree, which is the open question in
-[085-experiment-results.md](085-experiment-results.md#open-questions).
+hashes agree.
 
 ### Same permutation hashes
 

@@ -25,7 +25,7 @@ can be asked to emit a machine-readable result (`claude -p --output-format json`
 Cost reporting needs no OTel collector — it parses a file.
 
 **Future:** per-tool and per-span cost detail via OTel, once there is a trace store. See
-[020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1).
+[020-goals-non-goals.md](020-goals-non-goals.md#soon-to-follow).
 
 ## The result file
 

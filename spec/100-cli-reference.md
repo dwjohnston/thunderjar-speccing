@@ -62,7 +62,6 @@ Reads parameter names and harness family version/model maps under
 `experiment-parameters/` and writes
 `_generated/parameter-names.d.ts`, so a misspelled or deleted parameter is a type error in
 an experiment file. See [055-declaring-experiments.md](055-declaring-experiments.md#typed-names).
-Whether this is a standalone command or runs implicitly before the others is open there.
 
 ### `plan`
 
@@ -101,8 +100,7 @@ iteration as a container run, as described in
 what the other commands take.
 
 - **Human output:** progress per permutation and iteration, then a summary.
-- **Scripted output:** `--json` prints a JSON summary. The exit code distinguishes a
-  success from a regression and from an infrastructure error. See
+- **Scripted output:** `--json` prints a JSON summary. See
   [CI workflows](040-user-experience.md#ci-workflows).
 
 Options to narrow a run (for example to a single permutation) are not settled.
@@ -158,10 +156,11 @@ Example:
 thunderjar compare 01K4X9J2E8MQZ3V7R5T0WABCDE 01K5A2B7C9D4F6G8H0JKMNPQRS
 ```
 
-Compares two executions' aggregation results. Which comparisons are legitimate when
-permutation hashes differ, and how that is shown, is the open question in
-[085-experiment-results.md](085-experiment-results.md#open-questions), and belongs in
-[110-cli-report-visualization.md](110-cli-report-visualization.md). Supports `--json`.
+Compares two executions' aggregation results. It reports differences and makes no
+judgement about them: Thunderjar has no notion of a regression (see
+[020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1)). Example output is in
+[110-cli-report-visualization.md](110-cli-report-visualization.md#compare). Supports
+`--json`.
 
 ### `remeasure`
 
@@ -207,9 +206,7 @@ Run from inside a git repository. Fetches the run's end state and creates the br
 - `--json` on every command that reports, for scripting.
 - Exit codes: success, and infrastructure error are
   distinct.
-- Executions are addressed by execution ID and container runs by their ID. How a
-  container run is named on the command line is open in
-  [090-restore-purge.md](090-restore-purge.md#open-questions).
+- Executions are addressed by execution ID and container runs by their ID.
 
 ## Out of scope for the first pass
 

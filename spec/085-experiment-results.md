@@ -18,7 +18,8 @@ Two stores, described in [070-data-architecture.md](070-data-architecture.md):
 
 Measurements run **after** the postrun image is committed and pushed, in a short-lived
 [measurement container](030-terminology.md#measurement-container) started from that
-image, which is then discarded. The reasoning is in
+image, which is then discarded. A container run whose agent
+[failed or timed out](080-docker-execution.md#when-the-agent-fails) is not measured. The reasoning is in
 [080-docker-execution.md](080-docker-execution.md#why-commit-happens-before-measurement).
 
 Each of the task's measurements is an instrument plus a config. The instrument's logic
@@ -156,7 +157,8 @@ type ContainerRunRecord = {
     modelId: "claude-haiku-4-5-20251001" },
   result: { /* as above */ },
   tokenCosts: { /* as above */ },
-  execution: { startedAt: 1790692255104, finishedAt: 1790692297416, exitCode: 0 },
+  execution: { startedAt: 1790692255104, finishedAt: 1790692297416, exitCode: 0,
+    outcome: "completed" },
 }
 ```
 
@@ -176,8 +178,13 @@ type Execution = {
   startedAt: number; // epoch ms, harness start
   finishedAt: number; // epoch ms, harness exit
   exitCode: number; // the harness process's exit code
+  outcome: "completed" | "failed" | "timedOut";
 };
 ```
+
+`outcome` is derived from `exitCode`: `0` is `completed`, `124` is `timedOut`, anything
+else is `failed`. See
+[080-docker-execution.md](080-docker-execution.md#when-the-agent-fails).
 
 Duration is `finishedAt - startedAt`: the agent's execution only, not image pulls,
 container setup, or measurement. Because the file is in the postrun image, this is
@@ -335,12 +342,3 @@ The resolved pair's family, version and model ID are stored for
 Token costs are backfillable on the same terms, since the harness's result file is
 preserved in the image too — see
 [087-collecting-token-costs.md](087-collecting-token-costs.md#backfilling-token-costs).
-
-## Traces and transcripts
-
-A run's OTel trace and session transcript stay in its postrun image. To read them, pull
-the image and read them from its filesystem, same as everything else the run left behind.
-
-**Future:** a separate trace store, so viewing a trace doesn't need a full image pull —
-expected to be the first fast-follow after v1. See
-[020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1).

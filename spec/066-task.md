@@ -31,6 +31,7 @@ the initial prompt `plain`.
 // experiment-parameters/tasks/is-prime/initial-prompts/plain.ts
 export default declareInitialPrompt({
   prompt: "Create a file isPrime.ts exporting a function that tests for primality.",
+  timeoutSeconds: 600,
   applyParameter: () => ``,
 });
 ```
@@ -38,6 +39,7 @@ export default declareInitialPrompt({
 | Field | What it is |
 |---|---|
 | `prompt` | The initial prompt. Reaches the harness's `cli` as `ctx.initialPrompt`. |
+| `timeoutSeconds` | How long the harness may run before Thunderjar kills it. Required. See [Timeout](#timeout). |
 | `applyParameter` | Returns an empty string. An initial prompt adds nothing to the image. |
 
 An initial prompt is distinct from a [prompt set](063-prompt-set.md), which shapes the
@@ -52,6 +54,18 @@ initialPrompt: ["plain", "terse"],
 
 See [055-declaring-experiments.md](055-declaring-experiments.md#declaration).
 _(Referenced by: [055-declaring-experiments.md](055-declaring-experiments.md), [064-harness.md](064-harness.md).)_
+
+## Timeout
+
+Each initial prompt declares its own `timeoutSeconds`. A container run that passes it is
+recorded as `timedOut` — see
+[080-docker-execution.md](080-docker-execution.md#when-the-agent-fails).
+
+The timeout is part of the initial prompt's content, so it is in its parameter hash:
+changing it changes the permutation hash, and runs under different timeouts are not
+treated as the same permutation. Each initial prompt of a task repeats the value.
+_(Referenced by: [080-docker-execution.md](080-docker-execution.md#the-execution-wrapper),
+[020-goals-non-goals.md](020-goals-non-goals.md).)_
 
 ## When it applies
 

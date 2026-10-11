@@ -214,9 +214,8 @@ An **aggregation result** combines the Results of every iteration of one permuta
 | Term | Definition |
 |---|---|
 | **Run data store** | Where container run metadata is persisted: date, the permutation's experiment parameters and permutation hash, measurements, cost, tokens, duration. Enables querying and trending over time. See [085-experiment-results.md](085-experiment-results.md). |
-| **Image store** | Registry (e.g., Docker Hub, ECR) where prerun and postrun images are stored, tagged as above, enabling restore and inspection later. A run's OTel trace and session transcript live in its postrun image. |
+| **Image store** | Registry (e.g., Docker Hub, ECR) where prerun and postrun images are stored, tagged as above, enabling restore and inspection later. |
 
-**Future:** a separate **trace store** for OTel traces and session transcripts, so
-viewing one doesn't need a full image pull. See
-[020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1).
+**Future:** OTel traces and session transcripts, and a **trace store** to hold them. See
+[020-goals-non-goals.md](020-goals-non-goals.md#soon-to-follow).
 

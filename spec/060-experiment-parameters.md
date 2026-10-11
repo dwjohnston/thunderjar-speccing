@@ -149,7 +149,7 @@ when the harness is invoked; its `applyParameter` returns an empty string:
 | Code state | commit, then dependencies / fixture generation | — |
 | Prompt set | prompt files | — |
 | Harness/model pair | installs the selected harness version | invoked via `cli` with the resolved version and model ID |
-| Initial prompt | — | `ctx.initialPrompt` |
+| Initial prompt | — | `ctx.initialPrompt`, and the run's timeout |
 
 This split is the same one the flowchart in
 [080-docker-execution.md](080-docker-execution.md#process) draws as its
@@ -228,6 +228,7 @@ initial prompts, excluded from every parameter hash. Detail: [066-task.md](066-t
 // experiment-parameters/tasks/is-prime/initial-prompts/plain.ts
 export default declareInitialPrompt({
   prompt: "Create a file isPrime.ts exporting a function that tests for primality.",
+  timeoutSeconds: 600,
   applyParameter: () => ``,
 });
 ```

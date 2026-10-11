@@ -44,9 +44,8 @@ in the order shown. _(Referenced by:
 The container started at `K` has no Docker daemon, so a task can't have the agent run
 Docker itself. _(Referenced by: [020-goals-non-goals.md](020-goals-non-goals.md).)_
 
-What gets written to the run data store at `P`, and what's deliberately *not* extracted
-in v1 (the OTel trace and session transcript — pull the postrun image for those instead),
-is covered in [085-experiment-results.md](085-experiment-results.md).
+What gets written to the run data store at `P` is covered in
+[085-experiment-results.md](085-experiment-results.md).
 
 ## Why commit happens before measurement
 
@@ -75,11 +74,12 @@ read them years later, exactly as the original run did.
 ## The execution wrapper
 
 At `L`, Thunderjar doesn't run the harness's `cli` command directly. It wraps it, inside
-the container, to record when the agent started, when it finished, and how it exited:
+the container, to enforce the [initial prompt's timeout](066-task.md#timeout) and to record when
+the agent started, when it finished, and how it exited:
 
 ```sh
 start=$(date +%s%3N)
-<command returned by the harness's cli>
+timeout 600 <command returned by the harness's cli>   # 600: the initial prompt's timeoutSeconds
 code=$?
 end=$(date +%s%3N)
 echo "{\"startedAt\":$start,\"finishedAt\":$end,\"exitCode\":$code}" > /thunderjar/run.json
@@ -99,4 +99,33 @@ container setup and measurement are not part of it — measurement happens after
 and its duration changes every time measurements are backfilled, so it isn't a fact about
 the run. _(Referenced by: [085-experiment-results.md](085-experiment-results.md#execution),
 [064-harness.md](064-harness.md).)_
+
+## When the agent fails
+
+A container run fails when the harness exits non-zero, or runs past the initial prompt's timeout.
+`timeout` kills the harness and exits `124`, so both cases reach the wrapper as an exit
+code.
+
+| Exit code | `outcome` |
+|---|---|
+| `0` | `completed` |
+| `124` | `timedOut` |
+| anything else | `failed` |
+
+```json
+{ "startedAt": 1790692255104, "finishedAt": 1790692855104, "exitCode": 124 }
+```
+
+- The postrun image is still committed and pushed, so a failed run can be restored and
+  inspected.
+- The run is recorded with its `outcome` — see
+  [085-experiment-results.md](085-experiment-results.md#execution).
+- **It is not measured.** No measurement container is started, and its Result is empty.
+- The experiment execution carries on with its remaining container runs.
+
+There are no cost or resource limits. How a failed run counts in its permutation's
+aggregation result is unresolved — see
+[020-goals-non-goals.md](020-goals-non-goals.md#to-revisit).
+_(Referenced by: [085-experiment-results.md](085-experiment-results.md#execution),
+[066-task.md](066-task.md#timeout), [020-goals-non-goals.md](020-goals-non-goals.md).)_
 

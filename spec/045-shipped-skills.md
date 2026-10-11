@@ -5,6 +5,20 @@ experiments. Writing a good measurement is the hard part of capturing a test cas
 it is easiest while the session that produced it is still in context. Assumes
 [User Experience](040-user-experience.md), whose three scenarios this page builds on.
 
+## Installing
+
+Skills are installed with [skills.sh](https://skills.sh), from Thunderjar's repository:
+
+```
+npx skills add <owner>/<repository>
+```
+
+```
+npx skills add dwjohnston/thunderjar
+```
+
+`thunderjar init` does not install them.
+
 ## `thunderjar-test-case`
 
 Recognises a session worth capturing, offers to capture it, and then helps write the

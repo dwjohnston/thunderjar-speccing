@@ -14,12 +14,15 @@ What's in scope vs. explicitly not.
   indefinitely for now; revisit once storage cost or volume actually becomes a
   problem. (Touches [080-docker-execution.md](080-docker-execution.md) and
   [090-restore-purge.md](090-restore-purge.md).)
-- **Extracting session logs/telemetry out of the container into a separate trace
-  store.** The OTel trace and session transcript aren't pulled out into their own
-  storage for v1 — if you want them, pull the postrun image and read them from its
-  filesystem instead. Most likely the first fast-follow after v1, not a long-term
-  non-goal. (See [085-experiment-results.md](085-experiment-results.md) and
-  [070-data-architecture.md](070-data-architecture.md).)
+- **Regressions.** Thunderjar has no notion of a regression: no baseline, no threshold,
+  no pass/fail verdict on an execution, and no exit code for one. It presents
+  comparisons between results and leaves the judgement to the reader. (See
+  [100-cli-reference.md](100-cli-reference.md#compare) and
+  [110-cli-report-visualization.md](110-cli-report-visualization.md#compare).)
+
+- **Cost and resource limits.** No spending cap, token budget, or CPU/memory limit on a
+  container run. The only limit is the initial prompt's timeout. (See
+  [066-task.md](066-task.md#timeout).)
 
 - **Instrument-owned aggregation.** Measuring instruments declaring a default way their
   values combine across iterations, so a measurement file needn't state one. In v1 each
@@ -64,15 +67,23 @@ What's in scope vs. explicitly not.
   [080-docker-execution.md](080-docker-execution.md#process).)
   _(Referenced by: [080-docker-execution.md](080-docker-execution.md#process).)_
 
+## Soon to follow
+
+Non-goals for v1 that are expected to be the first things added after it.
+
+- **OTel traces and session transcripts.** v1 does not collect, preserve or expose a
+  container run's OTel trace or session transcript, and has no trace store. Token costs
+  come from the harness's result file instead (see
+  [087-collecting-token-costs.md](087-collecting-token-costs.md#where-the-numbers-come-from)).
+
 ## To revisit
 
 Unresolved, but things we *are* intending to address in v1 — unlike the non-goals above.
 
 - **Thunderjar's own injected setup in the Docker image.** Beyond the five experiment
   parameters, Thunderjar itself may need to bake things into the image that aren't any
-  experimenter's concern — e.g. OTel collector config or other instrumentation needed
-  for telemetry. Where this fits in the image-build sequence is unresolved. (See
-  [080-docker-execution.md](080-docker-execution.md#open-questions).) Related to the
+  experimenter's concern — e.g. the `/thunderjar/` directory its execution wrapper writes
+  to. Where this fits in the image-build sequence is unresolved. Related to the
   harness image question below — both are "frozen tooling layered into the prerun
   image", and may want one mechanism rather than two.
 - **Where harness images come from.** A harness declaration's `applyParameter` can layer
@@ -119,6 +130,11 @@ Unresolved, but things we *are* intending to address in v1 — unlike the non-go
   iterations are counted when a measure's values are combined. Excluding them silently
   flatters the aggregate; counting them as zero is wrong. See
   [085-experiment-results.md](085-experiment-results.md#how-a-measures-values-combine).
+
+- **Failed container runs in aggregation results.** A `failed` or `timedOut` run is not
+  measured, so it has no values to combine. How it counts in its permutation's
+  aggregation result is the same question as the entry above. See
+  [080-docker-execution.md](080-docker-execution.md#when-the-agent-fails).
 
 ## Open questions
 
