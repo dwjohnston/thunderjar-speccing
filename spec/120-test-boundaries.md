@@ -39,6 +39,8 @@ Docker is cut off entirely. Instead of running Docker, the adapter prints the Do
 
 This proves the wiring: given this test case definition and these arguments, these commands are issued in this order. It does not prove that the commands work.
 
+Fixtures are deterministic, so these tests assert on the exact output, hashes included. A changed hash is a change to execution identity, so a failing exact match is a tripwire to investigate, not noise to loosen. The expected output is regenerated from the fixture deliberately, in the same change that alters it.
+
 ## 3. Docker image tests
 
 A class of tests in which Docker is real and the images are real. The only fake is the agent. Each test takes a real starting state, performs one step, and asserts on the real image or data that results.

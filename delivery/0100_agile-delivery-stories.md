@@ -13,8 +13,8 @@ downstream can be built and tested before a real agent, or even Docker, is invol
    landing page exists.
 2. **Init.** `thunderjar init` scaffolds the folder structure with empty `declareX` stubs.
 3. **Declarations load, with generated types.** The `declareX` functions are populated;
-   `thunderjar plan` loads the config and lists what it found (parameters, tasks,
-   test cases). Typed pair names are generated, so a typo in a test case is a
+   `thunderjar plan <test case>` loads the config and lists the parameters the
+   test case selects. Typed pair names are generated, so a typo in a test case is a
    TypeScript error.
 4. **Validation.** Bad declarations produce clear errors, such as a missing file or an
    unknown parameter reference.

@@ -55,8 +55,8 @@ turning it into a sequence of small stories that build a working application.
 
 ## Format
 
-A story file has a title, a one-or-two sentence summary, and two key sections:
-**Artifacts** and **How to test**.
+A story file has a title, a one-or-two sentence summary, and these sections:
+**Spec**, **Artifacts**, **How to test** and **Human interventions**.
 
 ```markdown
 # <NNNN>: <Story name>
@@ -64,6 +64,10 @@ A story file has a title, a one-or-two sentence summary, and two key sections:
 <One or two sentences: what the user can do or see once this story is done.>
 
 Areas: <A–F letters from 0000>
+
+## Spec
+
+- [<page>](../spec/<page>.md) — <the part this story implements>
 
 ## Artifacts
 
@@ -76,15 +80,35 @@ packages, commands, files and folders, pages, pipelines.>
 
 <command that will be invoked to run test>
 
-## Human interventins
+## Human interventions
 
 <Any tasks that the human is required >
 ```
 
+- **Spec** links only the pages (or sections) the story directly implements or depends
+  on to be built correctly.
+  - Link a section anchor where one page covers several concerns.
+  - Don't link tangentially related pages. The implementing agent can discover those if
+    it needs them.
+  - Omit the section for stories with no spec coverage (e.g. `1100` hello world).
 - **Artifacts** are things you can point at:
   - "`thunderjar` is on npm"
   - "CI pipelines exists" 
   - "`thunderjar init` command exists" 
+  - **Name the thing, and give its shape.** If the artifact is a function, give its name
+    and signature and one line on what it does. If it is a file, give its path. If it is a
+    command, give its usage.
+
+    | 👎 Vague | 👍 Concrete |
+    |---|---|
+    | "Content hashing for each parameter kind" | "`hashBaseImage(path)`, `hashCodeState(path)`, `hashPromptSet(path)` — one function per kind, even if they share a helper" |
+    | "Config loading" | "`loadConfig(cwd: string): Config` — walks up from `cwd` to find `thunderjar/`" |
+    | "Permutation expansion" | "`expandMatrix(testCase): Permutation[]` — the cross product of the five arrays, in stable order" |
+
+    Signatures are a proposal, not a contract. The implementing agent may adjust them, but
+    the story should be specific enough to test against. Don't spell out internals: list
+    separate functions per concept rather than one generic helper, and leave shared
+    implementation to the implementer.
 - **How to test** 
   - Should be possible for both humans and agents to easily verify. 
     - eg. 👍 simple scripts to run in `package.json` 
@@ -135,6 +159,10 @@ The agent runs the check itself, so there are no 👷‍♂️ tasks.
 `thunderjar plan` expands a test case's matrix and prints each permutation.
 
 Areas: A
+
+## Spec
+
+- [060-test-case-parameters.md](../spec/060-test-case-parameters.md) — matrix and permutation expansion
 
 ## Artifacts
 
