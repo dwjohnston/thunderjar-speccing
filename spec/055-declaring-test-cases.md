@@ -42,7 +42,12 @@ names select files under the chosen task's `initial-prompts/` folder.
 The five arrays form a cross product, and each combination is one permutation. The
 example above has eight: two prompt sets × two harness/model pairs × two initial prompts,
 with base image and code state held fixed.
-_(Referenced by: [004-addressing-harness-model-pair.md](004-addressing-harness-model-pair.md).)_
+
+Permutations are listed in a stable order: the arrays are walked in the field order of the
+declaration, with the last varying fastest. This is the order `plan` prints them in. It
+does not guarantee the order they execute in.
+_(Referenced by: [004-addressing-harness-model-pair.md](004-addressing-harness-model-pair.md),
+[100-cli-reference.md](100-cli-reference.md#plan).)_
 
 ## One task, not measurements
 

@@ -14,7 +14,7 @@ Areas: A
 ## Artifacts
 
 - `thunderjar plan <test case>` takes a test case name
-- Permutation expansion: the cross product of the five arrays, in a stable order
+- Permutation expansion: the cross product of the five arrays, in a stable order (a listing order, not an execution order)
 - `plan` output, after the parameter lists from [1300](1300_declarations-and-types.md): matrix shape (e.g. `1/1/2/2/2`), one line per permutation, and the container run count (permutations × iterations)
 
 ```

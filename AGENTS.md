@@ -28,11 +28,7 @@ verify the exact original wording.
 
 ## Current phase
 
-We're actively defining out the project — filling in stub spec pages from the design
-conversation — while also deliberately constraining what's in scope for v1. When
-something comes up that's a reasonable idea but not needed for v1, prefer flagging it
-as a non-goal over speccing it out in detail. See
-[`spec/020-goals-non-goals.md`](spec/020-goals-non-goals.md).
+We're in the planning phase of lap one. See [launch-plan](./spec//002-launch-plan.md)
 
 ## Spec conventions
 

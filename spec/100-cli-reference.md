@@ -77,10 +77,32 @@ thunderjar plan is-prime-baseline
 
 Shows what `run` would do, without running anything and without cost:
 
-- the matrix shape and the permutations it produces,
-- each permutation's permutation hash, with floating parameters resolved,
-- which prerun images already exist and would be reused, and which would be built,
+- the parameters the test case selects, each with its parameter hash, with floating
+  parameters resolved,
+- the matrix shape and the permutations it produces, in the
+  [stable listing order](055-declaring-test-cases.md#a-test-case-is-a-matrix),
+- each permutation's prerun image name, which carries its permutation hash, and whether
+  that image already exists and would be reused or would be built,
 - how many container runs there would be (permutations × iterations).
+
+```
+$ thunderjar plan is-prime-baseline
+baseImage:     node20 (a91c03e7)
+codeState:     baseline (5be2d814)
+promptSet:     snerk (3f2a91c0), glurk (b71e44d2)
+harnessModel:  claude-code@2.1.283/haiku-4-5 (0d6f7a3b), codex@0.9.0/gpt-luna (c48e1f92)
+task:          is-prime
+initialPrompt: plain (e2907b55), terse (7a13c6d8)
+
+Matrix shape: 1/1/2/2/2 (8 permutations × 5 iterations = 40 container runs)
+
+ 1  node20 | baseline | snerk | claude-code@2.1.283/haiku-4-5 | plain
+    prerun-h4f9a21c8 (exists, reused)
+
+ 2  node20 | baseline | snerk | claude-code@2.1.283/haiku-4-5 | terse
+    prerun-h9c2e07ab (will build)
+ …
+```
 
 ### `run`
 
@@ -204,8 +226,10 @@ Run from inside a git repository. Fetches the run's end state and creates the br
 ## Conventions
 
 - `--json` on every command that reports, for scripting.
-- Exit codes: success, and infrastructure error are
-  distinct.
+- Exit codes: success, configuration error and infrastructure error are distinct. A
+  configuration error is a problem in the user's `thunderjar/` folder, such as a missing
+  file or an unknown parameter name. An infrastructure error is a problem in the
+  environment, such as an unreachable Docker daemon.
 - Executions are addressed by execution ID and container runs by their ID.
 
 ## Out of scope for the first pass
