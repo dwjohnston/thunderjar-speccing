@@ -39,7 +39,7 @@ Everything below is a proposal. No code exists yet.
   ([050-setup-and-configure.md](050-setup-and-configure.md#thunderjarconfigts)). It is
   built into Bun, so there is no dependency to install.
 - **`Bun.CryptoHasher`** computes the SHA-256 behind parameter hashes
-  ([060-experiment-parameters.md](060-experiment-parameters.md)). Bun has no canonical-JSON
+  ([060-test-case-parameters.md](060-test-case-parameters.md)). Bun has no canonical-JSON
   function, so key-order independence is Thunderjar's own code.
 - **Commander** defines the commands in [100-cli-reference.md](100-cli-reference.md). Each
   command is one file under `src/commands/`, registered by the entry point in `src/cli/`.

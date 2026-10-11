@@ -1,12 +1,12 @@
 # Harness/Model Pair Design
 
-**Status: applied.** The five experiment parameters are base image, code state, prompt
+**Status: applied.** The five test case parameters are base image, code state, prompt
 set, harness/model pair and initial prompt. The matrix crosses those five axes;
-any valid mix of pairs can be selected in one experiment.
+any valid mix of pairs can be selected in one test case.
 
 The design is recorded in:
 
-- [Declaring Experiments](055-declaring-experiments.md#an-experiment-is-a-matrix): the
+- [Declaring Test Cases](055-declaring-test-cases.md#a-test-case-is-a-matrix): the
   matrix and generated pair types.
 - [Harness/Model Pair](064-harness.md): the family declaration, versions, context and
   execution hash boundary. Token-cost collection is separate from execution identity.

@@ -132,7 +132,7 @@ The agent runs the check itself, so there are no 👷‍♂️ tasks.
 ```markdown
 # 1500: Permutations
 
-`thunderjar plan` expands an experiment's matrix and prints each permutation.
+`thunderjar plan` expands a test case's matrix and prints each permutation.
 
 Areas: A
 

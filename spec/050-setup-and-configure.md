@@ -8,7 +8,7 @@ Getting the application running, plus a high-level configuration overview that r
   itself runs on Bun, but users don't need to install Bun separately. See
   [How the CLI gets Bun](#how-the-cli-gets-bun).
 - **Docker**, and **git**.
-- Thunderjar runs inside the **git repository holding the code** it experiments on, with
+- Thunderjar runs inside the **git repository holding the code** it test cases on, with
   enough history for every commit its parameters name. In CI that means checking out
   with full history (e.g. `fetch-depth: 0`). See
   [062-code-state.md](062-code-state.md#where-the-commit-comes-from).
@@ -61,7 +61,7 @@ runs the CLI from each package that has its own.
 - `thunderjar/package.json`, **only when the project has no root `package.json`**;
 - `thunderjar/thunderjar.config.ts`;
 - the folder structure from [051-configuration-folder-structure.md](051-configuration-folder-structure.md);
-- a runnable **example experiment** (a cheap model, one iteration, a trivial task), so
+- a runnable **example test case** (a cheap model, one iteration, a trivial task), so
   `plan` and `run` work straight away and the example documents the layout;
 - `thunderjar/.gitignore`, ignoring `_generated/` and `.data/` (and `node_modules/` when
   `init` created the nested `package.json`). Everything else is committed, and the

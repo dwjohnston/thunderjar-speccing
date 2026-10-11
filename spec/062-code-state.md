@@ -3,15 +3,15 @@
 The codebase applied on top of the base image: a git commit from the user's repository,
 plus any setup the codebase needs before the agent starts.
 
-One of the five experiment parameters. Hashing and `applyParameter` are common to all of
-them — see [060-experiment-parameters.md](060-experiment-parameters.md).
+One of the five test case parameters. Hashing and `applyParameter` are common to all of
+them — see [060-test-case-parameters.md](060-test-case-parameters.md).
 
 ## Declaration
 
-Lives at `experiment-parameters/codeStates/<name>/index.ts`.
+Lives at `test-case-parameters/codeStates/<name>/index.ts`.
 
 ```ts
-// experiment-parameters/codeStates/baseline/index.ts
+// test-case-parameters/codeStates/baseline/index.ts
 export default declareCodeState({
   commit: "a1b2c3",
   applyParameter: () => `RUN npm ci`,
@@ -26,7 +26,7 @@ export default declareCodeState({
 A code state is always a git commit. `applyParameter` can add to it, but can't replace it.
 
 ```ts
-// experiment-parameters/codeStates/with-fixture/index.ts
+// test-case-parameters/codeStates/with-fixture/index.ts
 export default declareCodeState({
   commit: "a1b2c3",
   applyParameter: () => `RUN npm ci && ./scripts/seed-fixture-data.sh`,
@@ -56,7 +56,7 @@ WORKDIR /workspace
 RUN npm ci                                         # code state's fragment
 ```
 
-_(Referenced by: [060-experiment-parameters.md](060-experiment-parameters.md#declarations-and-applyparameter),
+_(Referenced by: [060-test-case-parameters.md](060-test-case-parameters.md#declarations-and-applyparameter),
 [063-prompt-set.md](063-prompt-set.md), [090-restore-purge.md](090-restore-purge.md),
 [061-base-image.md](061-base-image.md).)_
 
@@ -95,11 +95,11 @@ _(Referenced by: [050-setup-and-configure.md](050-setup-and-configure.md#prerequ
 
 A code state can follow a moving target, such as the tip of `main`, by declaring
 `determineHash` and taking its commit from `ctx.resolvedHash` (see
-[060-experiment-parameters.md](060-experiment-parameters.md#parameters-that-follow-a-moving-target)).
+[060-test-case-parameters.md](060-test-case-parameters.md#parameters-that-follow-a-moving-target)).
 This can be called a *floating parameter*.
 
 ```ts
-// experiment-parameters/codeStates/main/index.ts
+// test-case-parameters/codeStates/main/index.ts
 export default declareCodeState({
   determineHash: () => `git rev-parse origin/main`,
   commit: (ctx) => ctx.resolvedHash,
@@ -119,7 +119,7 @@ state's fragment runs after that and before the prompt set's.
 
 ## Future
 
-- Experiments kept in a different repository from the code they run against, and
+- Test cases kept in a different repository from the code they run against, and
   Thunderjar fetching a missing commit itself. See
   [020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1).
 

@@ -14,9 +14,9 @@ would do in one is done with the commands below. Command names are provisional.
 | [`init`](#init) | Scaffold the configuration folder. |
 | [`doctor`](#doctor) | Check that the environment is ready to run. |
 | [`generate`](#generate) | Emit the typed parameter names. |
-| [`plan`](#plan) | Dry run: show what an experiment would do. |
-| [`run`](#run) | Run an experiment: one experiment execution. |
-| [`executions`](#executions) | List past experiment executions. |
+| [`plan`](#plan) | Dry run: show what a test case would do. |
+| [`run`](#run) | Run a test case: one test case execution. |
+| [`executions`](#executions) | List past test case executions. |
 | [`show`](#show) | Show recorded results for an execution or a container run. |
 | [`compare`](#compare) | Compare two executions. |
 | [`remeasure`](#remeasure) | Apply the current measurements to past runs. |
@@ -30,7 +30,7 @@ thunderjar init
 
 Scaffolds the `thunderjar/` configuration folder, laid out as in
 [051-configuration-folder-structure.md](051-configuration-folder-structure.md). What it
-creates, and whether it includes an example experiment, depends on
+creates, and whether it includes an example test case, depends on
 [050-setup-and-configure.md](050-setup-and-configure.md).
 
 ### `doctor`
@@ -40,7 +40,7 @@ thunderjar doctor
 ```
 
 A preflight for the setup described in
-[050-setup-and-configure.md](050-setup-and-configure.md). It runs no experiment and costs
+[050-setup-and-configure.md](050-setup-and-configure.md). It runs no test case and costs
 nothing. It checks that:
 
 - the Docker daemon is reachable;
@@ -59,14 +59,14 @@ thunderjar generate
 ```
 
 Reads parameter names and harness family version/model maps under
-`experiment-parameters/` and writes
+`test-case-parameters/` and writes
 `_generated/parameter-names.d.ts`, so a misspelled or deleted parameter is a type error in
-an experiment file. See [055-declaring-experiments.md](055-declaring-experiments.md#typed-names).
+a test case file. See [055-declaring-test-cases.md](055-declaring-test-cases.md#typed-names).
 
 ### `plan`
 
 ```
-thunderjar plan <experiment>
+thunderjar plan <test case>
 ```
 
 Example:
@@ -85,7 +85,7 @@ Shows what `run` would do, without running anything and without cost:
 ### `run`
 
 ```
-thunderjar run <experiment>
+thunderjar run <test case>
 ```
 
 Example:
@@ -94,7 +94,7 @@ Example:
 thunderjar run is-prime-baseline
 ```
 
-Runs one experiment execution: resolves the matrix, then for each permutation runs each
+Runs one test case execution: resolves the matrix, then for each permutation runs each
 iteration as a container run, as described in
 [080-docker-execution.md](080-docker-execution.md). Prints the execution ID, which is
 what the other commands take.
@@ -108,7 +108,7 @@ Options to narrow a run (for example to a single permutation) are not settled.
 ### `executions`
 
 ```
-thunderjar executions [<experiment>]
+thunderjar executions [<test case>]
 ```
 
 Example:
@@ -117,7 +117,7 @@ Example:
 thunderjar executions is-prime-baseline
 ```
 
-Lists past experiment executions, newest first: execution ID, experiment, date. Exists so
+Lists past test case executions, newest first: execution ID, test case, date. Exists so
 there are IDs to give to `show`, `compare`, `remeasure` and `restore`.
 
 ### `show`
@@ -141,7 +141,7 @@ given:
 - **A container run** shows that one iteration: its parameters, measures, cost, tokens
   and duration.
 
-An experiment name can stand in for an execution ID, meaning its latest execution.
+A test case name can stand in for an execution ID, meaning its latest execution.
 Supports `--json`.
 
 ### `compare`
@@ -165,7 +165,7 @@ judgement about them: Thunderjar has no notion of a regression (see
 ### `remeasure`
 
 ```
-thunderjar remeasure <experiment | execution>
+thunderjar remeasure <test case | execution>
 ```
 
 Example:
@@ -179,11 +179,11 @@ Applies the measurements that currently exist on the filesystem to past containe
 without rerunning the agent. Each run is measured in a new
 [measurement container](030-terminology.md#measurement-container) started from its
 postrun image, and the new measures are added to its recorded
-[result](085-experiment-results.md#the-result-record). This is the same path as the
+[result](085-test-case-results.md#the-result-record). This is the same path as the
 original measurement, not a separate one.
 
 - **An execution** remeasures exactly the container runs in it.
-- **An experiment** remeasures every past execution of it.
+- **A test case** remeasures every past execution of it.
 
 ### `restore`
 
@@ -214,7 +214,7 @@ Run from inside a git repository. Fetches the run's end state and creates the br
   [020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1).
 - **`build`**, building and pushing prerun images without running the harness. Likely to
   become useful for testing Thunderjar itself.
-- **`list`** for declared experiments, parameters and tasks. These are files in the
+- **`list`** for declared test cases, parameters and tasks. These are files in the
   configuration folder.
 - **`purge`.** See [090-restore-purge.md](090-restore-purge.md#purge).
 

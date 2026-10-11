@@ -3,15 +3,15 @@
 A named, reusable action that overlays prompt files (`CLAUDE.md`, skills, rules) into
 the worktree before the harness runs.
 
-One of the five experiment parameters. Hashing and `applyParameter` are common to all of
-them — see [060-experiment-parameters.md](060-experiment-parameters.md).
+One of the five test case parameters. Hashing and `applyParameter` are common to all of
+them — see [060-test-case-parameters.md](060-test-case-parameters.md).
 
 ## Declaration
 
-Lives at `experiment-parameters/promptSets/<name>/index.ts`.
+Lives at `test-case-parameters/promptSets/<name>/index.ts`.
 
 ```ts
-// experiment-parameters/promptSets/snerk/index.ts
+// test-case-parameters/promptSets/snerk/index.ts
 export default declarePromptSet({
   commit: "e4f5a6",
   files: { "prompts/snerk.md": "CLAUDE.md" },
@@ -50,7 +50,7 @@ The declaration points at them rather than copying them into `thunderjar/`.
 
 The commit is the prompt set's own, independent of the code state's. That keeps the two
 axes orthogonal: a matrix can vary prompt sets while holding code state fixed, which is
-the single most common experiment shape.
+the single most common test case shape.
 
 ## When it applies
 

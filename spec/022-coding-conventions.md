@@ -1,7 +1,7 @@
 # Coding Conventions
 
 Conventions for the TypeScript a Thunderjar user writes — parameter declarations,
-task declarations, experiment declarations — and so for every example of that code in
+task declarations, test case declarations — and so for every example of that code in
 this spec.
 
 ## `declareX()` functions, not bare exports
@@ -11,7 +11,7 @@ function for its kind. Never a bare object, and never typed with `satisfies`, a 
 assertion (`as`), or a type annotation (`const harness: Harness = …`).
 
 ```ts
-// experiment-parameters/harnessModels/claude-code/index.ts
+// test-case-parameters/harnessModels/claude-code/index.ts
 export default declareHarness({
   applyParameter: (ctx) => `RUN npm install -g @anthropic-ai/claude-code@${ctx.version}`,
   cli: (ctx) => `claude -p "${ctx.initialPrompt}" > ${ctx.resultPath}`,
@@ -54,19 +54,19 @@ One function per kind:
 | Token-cost collector | `declareTokenCostCollector` |
 | Initial prompt | `declareInitialPrompt` |
 | Measurement | `declareMeasurement` |
-| Experiment | `declareExperiment` |
+| Test case | `declareTestCase` |
 
 The family, maps and collector form a [family declaration](064-harness.md#family-declaration);
 the selected pair is the parameter value.
 
-Measurement and experiment aren't experiment parameters — a measurement is associated
-with a task, and an experiment is a matrix *over* parameters, not one of them — but
+Measurement and test case aren't test case parameters — a measurement is associated
+with a task, and a test case is a matrix *over* parameters, not one of them — but
 their files are Thunderjar configuration all the same, so the same rule applies.
 
 ## Generated files go in `_generated/`, and are git-ignored
 
 Anything Thunderjar generates — such as the parameter-name types described in
-[055-declaring-experiments.md](055-declaring-experiments.md#typed-names)
+[055-declaring-test-cases.md](055-declaring-test-cases.md#typed-names)
 — is written to a `_generated/` folder, never edited by hand, and never committed.
 
 ```

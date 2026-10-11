@@ -4,7 +4,7 @@ What needs to be done between now and launch, in order. Not how — each phase g
 own detail when we reach it.
 
 **Launch** means a public open-source beta: a pre-release version that someone outside
-the project can find on the website, install from npm, and run an experiment with.
+the project can find on the website, install from npm, and run a test case with.
 
 **Deploy to production first, not last.** The npm package and the website go live
 before there is any real functionality, and every change after that ships through the

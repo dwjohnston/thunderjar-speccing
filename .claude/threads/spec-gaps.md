@@ -23,9 +23,9 @@ as nodes unless they block something else.
     view, and the `--json` summary shape.
 - [ ] **N3 Run data store is under-specified** — open
   - Claim: only `ContainerRunRecord` is typed; the rest of the store is one sentence.
-  - Notes: no execution record (experiment name, date, matrix, iterations) though
-    `executions` and `remeasure <experiment>` need one — `ContainerRunRecord` has no
-    experiment name; no type for the stored aggregation result (tokens/duration
+  - Notes: no execution record (test case name, date, matrix, iterations) though
+    `executions` and `remeasure <test case>` need one — `ContainerRunRecord` has no
+    test case name; no type for the stored aggregation result (tokens/duration
     aggregation shape missing); store interface not defined; 070 is a stub with `_TBD_`.
   - [ ] **N3.1 Sharing the store between CI and a developer** — open: 071 lists four
     options, none chosen. Regression triage (040) depends on it.
@@ -57,7 +57,7 @@ as nodes unless they block something else.
   (`npx skills add`), recorded in 045. Repository name in the example is a placeholder guess.
 - [ ] **N10 Small stale spots** — open
   - Notes: 030 🙋‍♂️ note says "6 parameters"; 085 Storage says "parameter hash" for the
-    permutation hash; 100 `init` says the example experiment "depends on" 050, which
+    permutation hash; 100 `init` says the example test case "depends on" 050, which
     already decides it; 120 asserts image "labels" that no page defines; 150 lists
     interactive mode in `src/cli/`; README describes 110 as out of scope and 130 as
     populated; no command re-collects token costs (087 backfill) unless `remeasure` does.

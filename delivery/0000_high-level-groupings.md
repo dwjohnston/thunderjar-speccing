@@ -4,25 +4,25 @@ A map of Thunderjar's concepts, so thinking can be constrained to one area at a 
 
 ## The model in one sentence
 
-An **experiment** is a matrix of parameters. Each combination (a **permutation**) is
+A **test case** is a matrix of parameters. Each combination (a **permutation**) is
 built into an image, run repeatedly, **measured**, and the results are **compared**.
 
 ## Six areas
 
 ### A. Declare — what do I want to vary?
 
-Concepts: experiment, the 5 parameters, task, matrix shape, permutation.
+Concepts: test case, the 5 parameters, task, matrix shape, permutation.
 
 - [030-terminology.md](../spec/030-terminology.md)
 - [051-configuration-folder-structure.md](../spec/051-configuration-folder-structure.md)
-- [055-declaring-experiments.md](../spec/055-declaring-experiments.md)
-- [060-experiment-parameters.md](../spec/060-experiment-parameters.md)
+- [055-declaring-test-cases.md](../spec/055-declaring-test-cases.md)
+- [060-test-case-parameters.md](../spec/060-test-case-parameters.md)
 
 ### B. Identity — when are two runs comparable?
 
 Concepts: parameter hash, permutation hash, floating parameter.
 
-- [060-experiment-parameters.md](../spec/060-experiment-parameters.md) (parameter hashing and identity, moving targets)
+- [060-test-case-parameters.md](../spec/060-test-case-parameters.md) (parameter hashing and identity, moving targets)
 - [064-harness.md](../spec/064-harness.md) (Hashing section)
 - [081-docker-tagging.md](../spec/081-docker-tagging.md) (permutation hash in tags)
 
@@ -44,8 +44,8 @@ Concepts: prerun image, harness invocation, postrun image, iteration.
 Concepts: task measurements, instruments, measurement container, backfill.
 
 - [066-task.md](../spec/066-task.md)
-- [060-experiment-parameters.md](../spec/060-experiment-parameters.md) (measuring instruments, measurement context)
-- [085-experiment-results.md](../spec/085-experiment-results.md)
+- [060-test-case-parameters.md](../spec/060-test-case-parameters.md) (measuring instruments, measurement context)
+- [085-test-case-results.md](../spec/085-test-case-results.md)
 - [045-shipped-skills.md](../spec/045-shipped-skills.md) (capturing sessions as test cases)
 
 ### E. Record and compare — where does it go, and how do I read it?
@@ -54,7 +54,7 @@ Concepts: run data store, image store, Result, aggregation result, token costs.
 
 - [070-data-architecture.md](../spec/070-data-architecture.md)
 - [071-data-persistence.md](../spec/071-data-persistence.md)
-- [085-experiment-results.md](../spec/085-experiment-results.md)
+- [085-test-case-results.md](../spec/085-test-case-results.md)
 - [087-collecting-token-costs.md](../spec/087-collecting-token-costs.md)
 
 ### F. Operate — how do I drive it?

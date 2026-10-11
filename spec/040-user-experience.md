@@ -6,12 +6,12 @@ on a schedule. Assumes the application is already set up (see
 
 ## Local workflows
 
-### Experiment candidates
+### Test case candidates
 
-Not every session is worth turning into an experiment. Three recurring scenarios:
+Not every session is worth turning into a test case. Three recurring scenarios:
 
 1. **Clean pass.** The agent nails the task, no notes. Still worth capturing as a
-   baseline/regression experiment — it locks in today's good behavior, so a future
+   baseline/regression test case — it locks in today's good behavior, so a future
    prompt, model, or code change that breaks it gets caught.
 2. **Near miss.** The agent almost nails it, but messes up one specific thing.
    Capture the task with a measurement that isolates exactly that mistake. Update
@@ -26,9 +26,9 @@ The common thread: a good candidate is one whose outcome — good or bad — can
 captured as an automated measurement, not just something a human happens to notice
 by eye.
 
-### Reusing a captured experiment
+### Reusing a captured test case
 
-Once an experiment exists, it's not a one-shot script — the same task and
+Once a test case exists, it's not a one-shot script — the same task and
 measurements get rerun against different parameter values to answer new
 questions later:
 
@@ -36,40 +36,40 @@ questions later:
   in a cheaper model, rerun, and see if the pass rate holds — turning a "no notes"
   pass into evidence for a cheaper default, without re-litigating whether the task
   itself still works.
-- **Guardrail authoring (scenario 3).** The `@ts-ignore` experiment reliably
+- **Guardrail authoring (scenario 3).** The `@ts-ignore` test case reliably
   reproduces the failure. Iterate on the prompt set (e.g. "never suppress a type
-  error, fix the underlying type") and rerun against the same experiment — the
+  error, fix the underlying type") and rerun against the same test case — the
   same before/after loop as scenario 2, just starting from a harder failure.
 
-This is why an experiment is captured as task + measurements against a stable
+This is why a test case is captured as task + measurements against a stable
 identity, rather than thrown away after the session that produced it: the
-[experiment parameters](030-terminology.md#experiment-parameters) (harness/model pair, prompt
+[test case parameters](030-terminology.md#test-case-parameters) (harness/model pair, prompt
 set, code state) are the axis you vary later, holding the rest fixed.
 
 ## CI workflows
 
 - Runs on a cadence (e.g. weekly), not per-commit — running the full matrix on
   every commit would be too expensive.
-- **Pinned experiments:** exact code state + prompt set, expected to keep
+- **Pinned test cases:** exact code state + prompt set, expected to keep
   producing the same result run after run. A change here is a signal, surfaced
   loudly through standard reporting.
-- **Experiments that follow a moving target:** same idea, but pointed at "current" code
+- **Test cases that follow a moving target:** same idea, but pointed at "current" code
   state / prompts, to catch slow drift as the codebase and prompt set grow. A parameter
   does this by resolving its own hash at execution time — see
-  [060-experiment-parameters.md](060-experiment-parameters.md#parameters-that-follow-a-moving-target).
+  [060-test-case-parameters.md](060-test-case-parameters.md#parameters-that-follow-a-moving-target).
 - CI invocation is non-interactive and scriptable: exit code plus a JSON summary,
   no interactive UI.
 
 ### Regression triage
 
 The motivating case for following a moving target: between two scheduled runs, one
-experiment's measurement suddenly degrades — a real regression, not noise. From
+test case's measurement suddenly degrades — a real regression, not noise. From
 there, the loop hands off from CI back to a developer's machine:
 
 1. A developer picks the failing run and **restores** it locally — the exact code
    state and prompt set that run used (see [Restore / Purge](090-restore-purge.md)).
 2. They reproduce locally and iterate on the prompt set — the same before/after
-   loop as [guardrail authoring](#reusing-a-captured-experiment) above — until
+   loop as [guardrail authoring](#reusing-a-captured-test case) above — until
    they isolate the offending prompt change.
 
 CI's job is to notice drift cheaply and reliably on a schedule; local is where

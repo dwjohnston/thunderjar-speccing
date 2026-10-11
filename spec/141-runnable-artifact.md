@@ -14,7 +14,7 @@ Thunderjar is published as a single npm package, `thunderjar`. It serves two rol
 1. **The CLI.** Its `bin` entry is `thunderjar`, a script starting with
    `#!/usr/bin/env bun`.
 2. **The library.** Its exports are the `declareX()` functions the user's
-   configuration imports: `declareConfig`, `declareExperiment`, `declareHarness`,
+   configuration imports: `declareConfig`, `declareTestCase`, `declareHarness`,
    the family map and collector helpers, `sqliteStore` and so on, following
    [022-coding-conventions.md](022-coding-conventions.md).
 
@@ -50,7 +50,7 @@ the shebang finds it. The consequences for users are in
 
 ### Loading the user's configuration
 
-The CLI loads `thunderjar.config.ts` and the experiment, parameter and measurement files
+The CLI loads `thunderjar.config.ts` and the test case, parameter and measurement files
 directly as TypeScript. Bun runs TypeScript without a build step, which is the reason
 the package targets it.
 

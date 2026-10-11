@@ -1,9 +1,9 @@
-# Experiment Parameters
+# Test Case Parameters
 
 Parameter hashing and identity, what every declaration has in common, and an
 example of each parameter's declaration. Each parameter's detail is on its own page,
 061 to 066. Also covers measuring instruments. Builds on the five
-[experiment parameters](030-terminology.md#experiment-parameters) already named
+[test case parameters](030-terminology.md#test-case-parameters) already named
 in the glossary.
 
 ## Parameter hashing and identity
@@ -12,7 +12,7 @@ in the glossary.
   plus any bundled scripts, templates or fixtures — to a **parameter hash**. Initial
   prompts are hashed individually; harness/model pairs use the boundary below.
   Measurements are hashed the same way, to a *content hash*, even though they aren't
-  experiment parameters: hashing them catches silent drift when a named definition's content changes underneath it.
+  test case parameters: hashing them catches silent drift when a named definition's content changes underneath it.
 - A permutation's **permutation hash** combines the hashes of its five resolved
   parameters: base image, code state, prompt set, harness/model pair and initial prompt.
   Two container runs with the same hash have the same declared execution inputs.
@@ -30,7 +30,7 @@ in the glossary.
 
 For base image, code state, prompt set and initial prompt declarations, the default
 hash comes from declaration content. A declaration can change that with one of two optional functions. Each returns a shell command.
-Thunderjar runs the command on the host at the start of each experiment execution, and
+Thunderjar runs the command on the host at the start of each test case execution, and
 uses its output.
 
 ```ts
@@ -52,7 +52,7 @@ Harness families use the [pair hash boundary](064-harness.md#hashing). A version
 entry's `determineHash` resolves its version; it does not replace the whole pair hash.
 
 ```ts
-// experiment-parameters/codeStates/main/index.ts
+// test-case-parameters/codeStates/main/index.ts
 export default declareCodeState({
   determineHash: () => `git rev-parse origin/main`,
   commit: (ctx) => ctx.resolvedHash,
@@ -61,7 +61,7 @@ export default declareCodeState({
 ```
 
 ```ts
-// experiment-parameters/baseImages/node20/index.ts
+// test-case-parameters/baseImages/node20/index.ts
 export default declareBaseImage({
   additionalHash: () => `docker image inspect --format '{{.Id}}' node:20-bookworm`,
   applyParameter: () => `FROM node:20-bookworm`,
@@ -85,7 +85,7 @@ resolved value, the image is built from exactly what was hashed.
 
 ### Parameters that follow a moving target
 
-The code state above means "whatever `origin/main` is when the experiment executes". Each
+The code state above means "whatever `origin/main` is when the test case executes". Each
 execution resolves it again. When it has moved, the parameter hash is different, so
 the permutation hash is different, and the execution is recorded as a different
 permutation of the same named parameters.
@@ -163,7 +163,7 @@ The image a permutation's prerun image is built `FROM`. Detail:
 [061-base-image.md](061-base-image.md).
 
 ```ts
-// experiment-parameters/baseImages/node20/index.ts
+// test-case-parameters/baseImages/node20/index.ts
 export default declareBaseImage({
   applyParameter: () => `FROM node:20-bookworm`,
 });
@@ -175,7 +175,7 @@ The codebase applied on top of the base image: a git commit, plus any setup it n
 Detail: [062-code-state.md](062-code-state.md).
 
 ```ts
-// experiment-parameters/codeStates/baseline/index.ts
+// test-case-parameters/codeStates/baseline/index.ts
 export default declareCodeState({
   commit: "a1b2c3",
   applyParameter: () => `RUN npm ci`,
@@ -188,7 +188,7 @@ A named, reusable action that overlays prompt files (`CLAUDE.md`, skills, rules)
 the worktree before the harness runs. Detail: [063-prompt-set.md](063-prompt-set.md).
 
 ```ts
-// experiment-parameters/promptSets/snerk/index.ts
+// test-case-parameters/promptSets/snerk/index.ts
 export default declarePromptSet({
   commit: "e4f5a6",
   files: { "prompts/snerk.md": "CLAUDE.md" },
@@ -204,7 +204,7 @@ Declaration and hashing detail: [064-harness.md](064-harness.md); model mapping:
 [065-model.md](065-model.md).
 
 ```ts
-// experiment-parameters/harnessModels/claude-code/index.ts
+// test-case-parameters/harnessModels/claude-code/index.ts
 export default declareHarness({
   applyParameter: (ctx) =>
     `RUN npm install -g @anthropic-ai/claude-code@${ctx.version}`,
@@ -225,7 +225,7 @@ of a task, and the task's measurements live in a `measurements/` folder beside i
 initial prompts, excluded from every parameter hash. Detail: [066-task.md](066-task.md).
 
 ```ts
-// experiment-parameters/tasks/is-prime/initial-prompts/plain.ts
+// test-case-parameters/tasks/is-prime/initial-prompts/plain.ts
 export default declareInitialPrompt({
   prompt: "Create a file isPrime.ts exporting a function that tests for primality.",
   timeoutSeconds: 600,

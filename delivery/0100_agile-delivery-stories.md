@@ -14,11 +14,11 @@ downstream can be built and tested before a real agent, or even Docker, is invol
 2. **Init.** `thunderjar init` scaffolds the folder structure with empty `declareX` stubs.
 3. **Declarations load, with generated types.** The `declareX` functions are populated;
    `thunderjar plan` loads the config and lists what it found (parameters, tasks,
-   experiments). Typed pair names are generated, so a typo in an experiment is a
+   test cases). Typed pair names are generated, so a typo in a test case is a
    TypeScript error.
 4. **Validation.** Bad declarations produce clear errors, such as a missing file or an
    unknown parameter reference.
-5. **Permutations.** `plan` expands an experiment's matrix and prints each permutation
+5. **Permutations.** `plan` expands a test case's matrix and prints each permutation
    with its names.
 6. **Hashes.** `plan` also prints parameter hashes and the permutation hash. Renaming a
    key keeps the hash; editing content changes it.

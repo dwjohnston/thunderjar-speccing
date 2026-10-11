@@ -9,22 +9,22 @@ mode is deferred (see [020-goals-non-goals.md](020-goals-non-goals.md#non-goals-
 All examples use one running scenario:
 
 - Task `is-prime`, with the three measurements from
-  [085-experiment-results.md](085-experiment-results.md#how-a-measures-values-combine):
+  [085-test-case-results.md](085-test-case-results.md#how-a-measures-values-combine):
   `isPrimeTsExists` (`rate`), `tsIgnoreCount` (`mean`, `max`) and `isPrimeTemplateTest` (`sum`).
-- Experiment `is-prime-baseline`: two harness/model pairs
+- Test case `is-prime-baseline`: two harness/model pairs
   (`claude-code@2.1.283/haiku-4-5`, `claude-code@2.1.283/sonnet-5-5`) with every other
   parameter fixed, so two permutations, five iterations each, ten container runs.
   Pair names and their generated types follow
   [064-harness.md](064-harness.md#addressing-a-pair) and
-  [055-declaring-experiments.md](055-declaring-experiments.md#typed-pairs).
+  [055-declaring-test-cases.md](055-declaring-test-cases.md#typed-pairs).
 
 ## `init`
 
 ```
 $ thunderjar init
 Created thunderjar/
-  experiments/
-  experiment-parameters/
+  test-cases/
+  test-case-parameters/
     baseImages/
     codeStates/
     promptSets/
@@ -32,14 +32,14 @@ Created thunderjar/
     tasks/
   _generated/
 
-Next: run `thunderjar plan is-prime-baseline` for the example experiment.
+Next: run `thunderjar plan is-prime-baseline` for the example test case.
 ```
 
 ## `generate`
 
 ```
 $ thunderjar generate
-Read experiment-parameters/
+Read test-case-parameters/
   baseImages      1 name
   codeStates      1 name
   promptSets      1 name
@@ -52,7 +52,7 @@ Wrote thunderjar/_generated/parameter-names.d.ts
 
 ```
 $ thunderjar plan is-prime-baseline
-Experiment  is-prime-baseline
+Test case  is-prime-baseline
 Task        is-prime
 
 Matrix
@@ -131,17 +131,17 @@ Exit 2
 
 ```
 $ thunderjar executions is-prime-baseline
-EXECUTION                   EXPERIMENT         DATE
+EXECUTION                   TEST CASE          DATE
 01K5A2B7C9D4F6G8H0JKMNPQRS  is-prime-baseline  2026-10-02 09:14
 01K4X9J2E8MQZ3V7R5T0WABCDE  is-prime-baseline  2026-09-29 14:30
 01K4S3M8T1V6Y0Z2B4D7FGHJKL  is-prime-baseline  2026-09-22 14:30
 ```
 
-With no argument, every experiment is listed:
+With no argument, every test case is listed:
 
 ```
 $ thunderjar executions
-EXECUTION                   EXPERIMENT          DATE
+EXECUTION                   TEST CASE          DATE
 01K5A2B7C9D4F6G8H0JKMNPQRS  is-prime-baseline   2026-10-02 09:14
 01K5A0C3E5G7J9L1N3Q5STUVWX  is-prime-exploring  2026-10-01 16:02
 01K4X9J2E8MQZ3V7R5T0WABCDE  is-prime-baseline   2026-09-29 14:30
@@ -156,7 +156,7 @@ One aggregation result per permutation.
 ```
 $ thunderjar show 01K4X9J2E8MQZ3V7R5T0WABCDE
 Execution   01K4X9J2E8MQZ3V7R5T0WABCDE
-Experiment  is-prime-baseline
+Test case  is-prime-baseline
 Task        is-prime
 Date        2026-09-29 14:30
 
@@ -187,7 +187,7 @@ Permutation 9be07d35  (5 iterations)
   duration   mean 1:03      max 1:11
 ```
 
-An experiment name stands for its latest execution:
+A test case name stands for its latest execution:
 
 ```
 $ thunderjar show is-prime-baseline
@@ -238,7 +238,7 @@ hashes agree.
 ### Same permutation hashes
 
 Each permutation in A is paired with the one in B of the same hash. This is the clean case:
-the same experiment, run twice, such as a weekly rerun.
+the same test case, run twice, such as a weekly rerun.
 
 ```
 $ thunderjar compare 01K4X9J2E8MQZ3V7R5T0WABCDE 01K5A2B7C9D4F6G8H0JKMNPQRS
@@ -326,7 +326,7 @@ Updated 10 container runs. Recomputed 2 aggregation results.
 The agent was not rerun.
 ```
 
-### An experiment
+### A test case
 
 ```
 $ thunderjar remeasure is-prime-baseline

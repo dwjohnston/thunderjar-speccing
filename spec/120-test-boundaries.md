@@ -37,7 +37,7 @@ The CLI is real and so are the configuration files: the test invokes the CLI aga
 
 Docker is cut off entirely. Instead of running Docker, the adapter prints the Docker commands that would have been run, and the test asserts on standard out.
 
-This proves the wiring: given this experiment definition and these arguments, these commands are issued in this order. It does not prove that the commands work.
+This proves the wiring: given this test case definition and these arguments, these commands are issued in this order. It does not prove that the commands work.
 
 ## 3. Docker image tests
 

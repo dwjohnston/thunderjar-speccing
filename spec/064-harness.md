@@ -1,9 +1,9 @@
 # Harness/Model Pair
 
 A **harness/model pair** selects an agent tool's family, version and root model. It is
-one of the five [experiment parameters](030-terminology.md#experiment-parameters).
+one of the five [test case parameters](030-terminology.md#test-case-parameters).
 A family is declared once; its version and model maps yield the pair values an
-[experiment](055-declaring-experiments.md#declaration) can select.
+[test case](055-declaring-test-cases.md#declaration) can select.
 
 ## Addressing a pair
 
@@ -20,15 +20,15 @@ Names select values; hashes identify execution content. Renaming a family, versi
 or model key preserves the hash when its resolved content is unchanged.
 _(Referenced by: [030-terminology.md](030-terminology.md),
 [051-configuration-folder-structure.md](051-configuration-folder-structure.md),
-[055-declaring-experiments.md](055-declaring-experiments.md),
-[060-experiment-parameters.md](060-experiment-parameters.md),
+[055-declaring-test-cases.md](055-declaring-test-cases.md),
+[060-test-case-parameters.md](060-test-case-parameters.md),
 [004-addressing-harness-model-pair.md](004-addressing-harness-model-pair.md),
 [110-cli-report-visualization.md](110-cli-report-visualization.md).)_
 
 ## Family declaration
 
 ```
-experiment-parameters/harnessModels/
+test-case-parameters/harnessModels/
   claude-code/
     index.ts
     models.ts
@@ -42,12 +42,12 @@ version names to resolved versions and optional execution overrides, and
 `collectTokenCosts.ts` interprets the preserved output. Supporting execution files can
 sit beside them.
 _(Referenced by: [051-configuration-folder-structure.md](051-configuration-folder-structure.md),
-[055-declaring-experiments.md](055-declaring-experiments.md),
+[055-declaring-test-cases.md](055-declaring-test-cases.md),
 [065-model.md](065-model.md), [022-coding-conventions.md](022-coding-conventions.md),
 [120-test-boundaries.md](120-test-boundaries.md).)_
 
 ```ts
-// experiment-parameters/harnessModels/claude-code/index.ts
+// test-case-parameters/harnessModels/claude-code/index.ts
 export default declareHarness({
   applyParameter: (ctx) =>
     `RUN npm install -g @anthropic-ai/claude-code@${ctx.version}`,
@@ -59,7 +59,7 @@ export default declareHarness({
 ```
 
 ```ts
-// experiment-parameters/harnessModels/claude-code/models.ts
+// test-case-parameters/harnessModels/claude-code/models.ts
 export default declareHarnessModels({
   "haiku-4-5": "claude-haiku-4-5-20251001",
   "sonnet-5-5": "claude-sonnet-5-5",
@@ -67,7 +67,7 @@ export default declareHarnessModels({
 ```
 
 ```ts
-// experiment-parameters/harnessModels/claude-code/versions.ts
+// test-case-parameters/harnessModels/claude-code/versions.ts
 export default declareHarnessVersions({
   "2.1.283": { version: "2.1.283" },
   "2.2.0": { version: "2.2.0" },
@@ -82,7 +82,7 @@ Each version entry supplies a pinned `version`. It can override `applyParameter`
 or `requiredEnv`; each supplied field replaces the family's field for that version.
 Every version uses the family's model map. The generated pair union contains every
 version/model combination within each family — see
-[055-declaring-experiments.md](055-declaring-experiments.md#typed-pairs).
+[055-declaring-test-cases.md](055-declaring-test-cases.md#typed-pairs).
 
 ```ts
 export default declareHarnessVersions({
@@ -97,10 +97,10 @@ export default declareHarnessVersions({
 ```
 
 A floating entry uses `determineHash` instead of a pinned `version`, following
-[060-experiment-parameters.md](060-experiment-parameters.md#parameters-that-follow-a-moving-target).
+[060-test-case-parameters.md](060-test-case-parameters.md#parameters-that-follow-a-moving-target).
 Its command output is the resolved version used in the pair hash and `ctx.version`.
 The family's code, selected execution overrides and model ID remain in the hash;
-resolution replaces only the version value. Resolve once per entry per experiment execution.
+resolution replaces only the version value. Resolve once per entry per test case execution.
 
 ```ts
 export default declareHarnessVersions({
@@ -115,7 +115,7 @@ With `harness-versions/claude-code.txt` containing:
 ```
 
 Selecting `claude-code@latest/haiku-4-5` uses `2.2.0` for that execution.
-_(Referenced by: [060-experiment-parameters.md](060-experiment-parameters.md),
+_(Referenced by: [060-test-case-parameters.md](060-test-case-parameters.md),
 [030-terminology.md](030-terminology.md).)_
 
 ## `applyParameter`: installing the tool
@@ -130,14 +130,14 @@ unresolved — see [020-goals-non-goals.md](020-goals-non-goals.md#to-revisit).
 |---|---|
 | `ctx.version` | The selected entry's resolved harness version. |
 | `ctx.modelId` | The selected model's ID from this family's map. |
-| `ctx.initialPrompt` | The experiment's [initial prompt](066-task.md#initial-prompts). |
+| `ctx.initialPrompt` | The test case's [initial prompt](066-task.md#initial-prompts). |
 | `ctx.resultPath` | Where the command must write its result file. |
 
 The resolved pair supplies the version and model ID together. `cli` must run the agent
 and leave a file at `ctx.resultPath`; Thunderjar hands its bytes to the family's
 collector. Thunderjar wraps the command to record timing and exit code — see
 [080-docker-execution.md](080-docker-execution.md#the-execution-wrapper).
-_(Referenced by: [060-experiment-parameters.md](060-experiment-parameters.md),
+_(Referenced by: [060-test-case-parameters.md](060-test-case-parameters.md),
 [065-model.md](065-model.md), [087-collecting-token-costs.md](087-collecting-token-costs.md).)_
 
 ## `collectTokenCosts`: reading back the cost
@@ -148,7 +148,7 @@ versions. Its result and failure behaviour are defined in
 [087-collecting-token-costs.md](087-collecting-token-costs.md#normalising-collecttokencosts).
 
 ```ts
-// experiment-parameters/harnessModels/claude-code/collectTokenCosts.ts
+// test-case-parameters/harnessModels/claude-code/collectTokenCosts.ts
 export default declareTokenCostCollector((raw, ctx) => {
   // Parse the format for ctx.version; ctx.modelId identifies the root model.
   return { outcome: "unavailable", reason: "notReported" };
@@ -196,6 +196,6 @@ bundled files count as execution content.
 A parser correction affects interpretation, so it does not change execution identity.
 Imports from outside the family folder are not covered by its content hash.
 _(Referenced by: [030-terminology.md](030-terminology.md),
-[060-experiment-parameters.md](060-experiment-parameters.md#parameter-hashing-and-identity),
+[060-test-case-parameters.md](060-test-case-parameters.md#parameter-hashing-and-identity),
 [087-collecting-token-costs.md](087-collecting-token-costs.md#backfilling-token-costs),
 [004-addressing-harness-model-pair.md](004-addressing-harness-model-pair.md).)_

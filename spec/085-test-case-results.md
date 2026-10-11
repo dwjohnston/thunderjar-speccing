@@ -1,4 +1,4 @@
-# Experiment Results
+# Test Case Results
 
 What gets recorded once a container run's postrun image is committed — picks up from
 [080-docker-execution.md](080-docker-execution.md#process). The token-cost half of the
@@ -8,7 +8,7 @@ same recording step is [087-collecting-token-costs.md](087-collecting-token-cost
 
 Two stores, described in [070-data-architecture.md](070-data-architecture.md):
 
-1. **Run data store** — date, the permutation's experiment parameters and parameter
+1. **Run data store** — date, the permutation's test case parameters and parameter
    hash, measurements, cost, tokens, duration. Small and queryable — this is what "did
    this get worse since last week" queries run against. Covered below.
 2. **Image store** — the prerun/postrun images themselves. See
@@ -25,7 +25,7 @@ image, which is then discarded. A container run whose agent
 Each of the task's measurements is an instrument plus a config. The instrument's logic
 runs host-side; the work it commands — globbing, reading files, writing a rendered test,
 running a test suite — happens inside the measurement container through the
-[measurement context](060-experiment-parameters.md#measurement-context).
+[measurement context](060-test-case-parameters.md#measurement-context).
 
 The single most useful consequence: **this is the same path as backfill.** Applying a
 measurement to a run from a year ago is not a different operation from measuring a fresh
@@ -126,7 +126,7 @@ type ContainerRunRecord = {
   postrunImage: string; // the tag, so the artifact is reachable from the record
   ranAt: string;
 
-  task: string; // the experiment's task, by name
+  task: string; // the test case's task, by name
 
   // each resolved parameter, by name and parameter hash
   parameters: Record<ParameterKind, { name: string; parameterHash: string }>;
@@ -197,7 +197,7 @@ harness — see `apiDurationMs` in
 ## Aggregation results
 
 Container runs aren't what gets compared. The unit of comparison is the **aggregation
-result**: the Results of every iteration of one permutation in one experiment execution,
+result**: the Results of every iteration of one permutation in one test case execution,
 combined. That holds even when there's only one iteration.
 
 ```
@@ -209,7 +209,7 @@ aggregation result = (execution ID, permutation hash) → the combined Results o
 ```
 
 Wherever the things being compared come from — permutations in the same execution,
-repeated executions of one experiment, or executions whose parameters [follow a moving target](060-experiment-parameters.md#parameters-that-follow-a-moving-target) —
+repeated executions of one test case, or executions whose parameters [follow a moving target](060-test-case-parameters.md#parameters-that-follow-a-moving-target) —
 comparing means comparing aggregation results. The only requirement is that they have
 the same shape, and backfilling measurements is what makes that achievable. Which ones
 to fetch and set side by side is the presentation layer's problem, not the store's.

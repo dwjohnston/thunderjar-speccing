@@ -1,15 +1,15 @@
 # Task
 
-The goal an experiment is about: its initial prompts, and the measurements that judge them.
+The goal a test case is about: its initial prompts, and the measurements that judge them.
 
-An experiment names one task. The experiment parameter is the **initial prompt** — the
+A test case names one task. The test case parameter is the **initial prompt** — the
 first prompt given to the harness, what the agent is asked to do. A task can have several
-wordings, so an experiment can compare them against the same measurements. Hashing and
+wordings, so a test case can compare them against the same measurements. Hashing and
 `applyParameter` are common to all parameters — see
-[060-experiment-parameters.md](060-experiment-parameters.md).
+[060-test-case-parameters.md](060-test-case-parameters.md).
 
 ```
-experiment-parameters/tasks/is-prime/
+test-case-parameters/tasks/is-prime/
 ├── initial-prompts/
 │   ├── plain.ts                   # one initial prompt. Hashed.
 │   └── terse.ts
@@ -28,7 +28,7 @@ Each file in `initial-prompts/` is one initial prompt, named by its file: `plain
 the initial prompt `plain`.
 
 ```ts
-// experiment-parameters/tasks/is-prime/initial-prompts/plain.ts
+// test-case-parameters/tasks/is-prime/initial-prompts/plain.ts
 export default declareInitialPrompt({
   prompt: "Create a file isPrime.ts exporting a function that tests for primality.",
   timeoutSeconds: 600,
@@ -45,15 +45,15 @@ export default declareInitialPrompt({
 An initial prompt is distinct from a [prompt set](063-prompt-set.md), which shapes the
 environment the agent runs in. An initial prompt is what the agent is asked to do.
 
-An experiment lists initial prompts of its one task:
+A test case lists initial prompts of its one task:
 
 ```ts
 task: "is-prime",
 initialPrompt: ["plain", "terse"],
 ```
 
-See [055-declaring-experiments.md](055-declaring-experiments.md#declaration).
-_(Referenced by: [055-declaring-experiments.md](055-declaring-experiments.md), [064-harness.md](064-harness.md).)_
+See [055-declaring-test-cases.md](055-declaring-test-cases.md#declaration).
+_(Referenced by: [055-declaring-test-cases.md](055-declaring-test-cases.md), [064-harness.md](064-harness.md).)_
 
 ## Timeout
 
@@ -82,7 +82,7 @@ One file per measurement, named by its file: `isPrimeTsExists.ts` is the measure
 `isPrimeTsExists`. Supporting files, like a `templateTest` template, sit alongside.
 
 ```ts
-// experiment-parameters/tasks/is-prime/measurements/isPrimeTemplateTest.ts
+// test-case-parameters/tasks/is-prime/measurements/isPrimeTemplateTest.ts
 export default declareMeasurement({
   instrument: "templateTest",
   config: {
@@ -93,7 +93,7 @@ export default declareMeasurement({
 ```
 
 Instruments and what a measurement produces are in
-[060-experiment-parameters.md](060-experiment-parameters.md#measuring-instruments--measurements).
+[060-test-case-parameters.md](060-test-case-parameters.md#measuring-instruments--measurements).
 
 ### Excluded from every parameter hash
 
@@ -101,8 +101,8 @@ Instruments and what a measurement produces are in
 outcome; they don't determine what runs, and they don't affect the prerun or postrun
 image. Changing them must not change the permutation hash.
 
-### Experiments name a task, not measurements
+### Test cases name a task, not measurements
 
-An experiment names one task. Measurements come with the task, so a second experiment
+A test case names one task. Measurements come with the task, so a second test case
 using `is-prime` gets the same measurements without copying them. Naming one task also
-means every result in an experiment shares one measurement set, so they are all comparable.
+means every result in a test case shares one measurement set, so they are all comparable.

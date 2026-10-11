@@ -2,19 +2,19 @@
 
 How a container run's token usage and cost are obtained, normalised across harnesses,
 and recorded. The measurements side of the same recording step is
-[085-experiment-results.md](085-experiment-results.md).
+[085-test-case-results.md](085-test-case-results.md).
 
 ## Collected, not measured
 
 Token costs are **collected**, not measured. They are a first-class field of every
 container run, produced by the harness itself and recorded automatically — not a
-[measuring instrument](060-experiment-parameters.md#measuring-instruments--measurements),
+[measuring instrument](060-test-case-parameters.md#measuring-instruments--measurements),
 and not declared per task.
 
 The distinction matters because it's tempting to model a token count as just another
 measure. It isn't: a measurement judges whether a task was done well, and varies by task.
 Token cost is the same question for every run in the system, so nobody should have to
-declare it. _(Referenced by: [085-experiment-results.md](085-experiment-results.md).)_
+declare it. _(Referenced by: [085-test-case-results.md](085-test-case-results.md).)_
 
 ## Where the numbers come from
 
@@ -167,7 +167,7 @@ through as `apiDurationMs`. Like dollars, it's optional: absent rather than zero
 harness doesn't report it.
 
 It complements the run's execution time, which Thunderjar records itself from outside the
-harness (see [085-experiment-results.md](085-experiment-results.md#execution)). The two
+harness (see [085-test-case-results.md](085-test-case-results.md#execution)). The two
 answer different questions: execution time is the whole of the agent's run, and API
 duration is the part of it spent waiting on the model. A run whose execution time grows
 while its API duration stays flat got slower in its tools, not its model.
@@ -220,5 +220,5 @@ Correcting the parser leaves the execution identity unchanged. Re-collection use
 current family collector with the run's original resolved version and model ID; those
 values must be stored with the run so floating entries and later map edits cannot
 change interpretation context.
-_(Referenced by: [085-experiment-results.md](085-experiment-results.md).)_
+_(Referenced by: [085-test-case-results.md](085-test-case-results.md).)_
 

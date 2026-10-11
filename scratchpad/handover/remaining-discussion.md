@@ -54,8 +54,8 @@ conversation. The current state of the files is taken as the source of truth.
   is the only place that says which models a harness runs. The map is excluded from the
   harness's content hash; the resolved model ID goes into the parameter hash. A model's
   identity is its folder name. `harness` and `model` stay as a cross product in
-  `declareExperiment`, and listing a model that one of the harnesses can't run is a type
-  error (051, Typed names). Mixed experiments are declared as two experiments. Working
+  `declareTestCase`, and listing a model that one of the harnesses can't run is a type
+  error (051, Typed names). Mixed test cases are declared as two test cases. Working
   demo of the types in `scratchpad/harness-model-types/index.ts`. Possible later change:
   move the map to its own file in the harness folder.
 - **Item 5, floating parameters** (uncommitted). Not a first-class primitive. A

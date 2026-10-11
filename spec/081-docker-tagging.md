@@ -2,7 +2,7 @@
 
 How prerun and postrun images are named. See [030-terminology.md](030-terminology.md) for
 **prerun image**, **postrun image**, **permutation hash**, **matrix shape**, and
-**single-permutation experiment**; see [080-docker-execution.md](080-docker-execution.md)
+**single-permutation test case**; see [080-docker-execution.md](080-docker-execution.md)
 for the run mechanics these tags get attached to.
 
 ## Tag formats
@@ -26,7 +26,7 @@ postrun-e01k4x9j2e8mqz3-h4f9a21c8-i00
   directly off its own tag — no separate lookup needed.
 - `e<execution ID>` — the full, untruncated execution ID (a ULID). Kept full length
   because, unlike the hash, it's load-bearing for uniqueness: it's what stops two
-  different experiment executions from colliding on the same postrun tag.
+  different test case executions from colliding on the same postrun tag.
 - `i<iteration index>` — zero-padded iteration index (`i00`, `i01`, …) within the
   permutation.
 
@@ -40,7 +40,7 @@ order.
 
 ## Worked examples
 
-### 1. Single-permutation experiment, 3 iterations, rerun later
+### 1. Single-permutation test case, 3 iterations, rerun later
 
 Matrix shape `1/1/1/1/1` — every parameter fixed, one permutation. Permutation hash stays
 `h4f9a21c8` for as long as the base image, code state, prompt set, harness/model pair, and

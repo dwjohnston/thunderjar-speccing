@@ -27,10 +27,10 @@ What's in scope vs. explicitly not.
 - **Instrument-owned aggregation.** Measuring instruments declaring a default way their
   values combine across iterations, so a measurement file needn't state one. In v1 each
   measurement chooses its own (see
-  [085-experiment-results.md](085-experiment-results.md#how-a-measures-values-combine)).
+  [085-test-case-results.md](085-test-case-results.md#how-a-measures-values-combine)).
   Most likely to return as a default that a measurement's own choice overrides.
 
-- **Skills that run or iterate experiments.** The shipped skill only helps capture a
+- **Skills that run or iterate test cases.** The shipped skill only helps capture a
   test case and write its measurements; running, rerunning and comparing stays in the
   CLI. (See [045-shipped-skills.md](045-shipped-skills.md).)
 
@@ -52,9 +52,9 @@ What's in scope vs. explicitly not.
   in the prompt cache question under "To revisit". (See
   [050-setup-and-configure.md](050-setup-and-configure.md#thunderjarconfigts).)
 
-- **Experiments in a different repository from the code.** Thunderjar reads commits from
+- **Test cases in a different repository from the code.** Thunderjar reads commits from
   the repository it runs in, so `thunderjar/` lives in the same repository as the code it
-  experiments on. A setting pointing at another repository is deferred. (See
+  test cases on. A setting pointing at another repository is deferred. (See
   [062-code-state.md](062-code-state.md#where-the-commit-comes-from).)
 
 - **Fetching missing commits.** Thunderjar assumes the environment already has every
@@ -80,9 +80,9 @@ Non-goals for v1 that are expected to be the first things added after it.
 
 Unresolved, but things we *are* intending to address in v1 — unlike the non-goals above.
 
-- **Thunderjar's own injected setup in the Docker image.** Beyond the five experiment
+- **Thunderjar's own injected setup in the Docker image.** Beyond the five test case
   parameters, Thunderjar itself may need to bake things into the image that aren't any
-  experimenter's concern — e.g. the `/thunderjar/` directory its execution wrapper writes
+  concern of whoever writes the test case — e.g. the `/thunderjar/` directory its execution wrapper writes
   to. Where this fits in the image-build sequence is unresolved. Related to the
   harness image question below — both are "frozen tooling layered into the prerun
   image", and may want one mechanism rather than two.
@@ -96,7 +96,7 @@ Unresolved, but things we *are* intending to address in v1 — unlike the non-go
   publish. A workable v1 answer is that `applyParameter` returns whatever Dockerfile
   fragment the author wants — `RUN npm install …` or `COPY --from=…` — and Thunderjar
   publishes nothing, which keeps the registry question a fast-follow rather than a
-  blocker. (See [060-experiment-parameters.md](060-experiment-parameters.md).)
+  blocker. (See [060-test-case-parameters.md](060-test-case-parameters.md).)
 - **Prompt cache isolation between container runs.** Parallel container runs sharing a
   prompt prefix can hit each other's prompt cache, so the second run's cost isn't an
   independent measurement. Container isolation does *not* help — the cache lives
@@ -129,7 +129,7 @@ Unresolved, but things we *are* intending to address in v1 — unlike the non-go
 - **Missing values in aggregation results.** How `skipped` / `erroredWhileMeasuring`
   iterations are counted when a measure's values are combined. Excluding them silently
   flatters the aggregate; counting them as zero is wrong. See
-  [085-experiment-results.md](085-experiment-results.md#how-a-measures-values-combine).
+  [085-test-case-results.md](085-test-case-results.md#how-a-measures-values-combine).
 
 - **Failed container runs in aggregation results.** A `failed` or `timedOut` run is not
   measured, so it has no values to combine. How it counts in its permutation's

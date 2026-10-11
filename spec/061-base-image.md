@@ -4,15 +4,15 @@ The image a permutation's prerun image is built `FROM`, before code state is app
 the base OS and runtime, plus any extra services a task needs (a database, a message
 broker) that code state, prompt set and harness don't provision themselves.
 
-One of the five experiment parameters. Hashing and `applyParameter` are common to all of
-them — see [060-experiment-parameters.md](060-experiment-parameters.md).
+One of the five test case parameters. Hashing and `applyParameter` are common to all of
+them — see [060-test-case-parameters.md](060-test-case-parameters.md).
 
 ## Declaration
 
-Lives at `experiment-parameters/baseImages/<name>/index.ts`.
+Lives at `test-case-parameters/baseImages/<name>/index.ts`.
 
 ```ts
-// experiment-parameters/baseImages/node20/index.ts
+// test-case-parameters/baseImages/node20/index.ts
 export default declareBaseImage({
   applyParameter: () => `FROM node:20-bookworm`,
 });
