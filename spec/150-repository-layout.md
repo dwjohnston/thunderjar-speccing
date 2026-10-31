@@ -2,7 +2,7 @@
 
 The folder structure of the Thunderjar project itself: its source, its tests, and the fixtures those tests need.
 
-This is distinct from [051-configuration-folder-structure.md](051-configuration-folder-structure.md), which describes the `thunderjar/` folder inside a *user's* project.
+This is distinct from [051-configuration-folder-structure.md](051-configuration-folder-structure.md), which describes the `.thunderjar/` folder inside a *user's* project.
 
 No source code exists yet, so everything below is a proposal.
 
@@ -24,7 +24,7 @@ thunderjar/
 ├── test/
 │   ├── fixtures/
 │   │   ├── images/                    # fixture Docker images — see below
-│   │   ├── projects/                  # example user projects, each with a real thunderjar/ config folder
+│   │   ├── projects/                  # example user projects, each with a real .thunderjar/ config folder
 │   │   └── harnesses/
 │   │       └── fake-agent.js          # the fake harness's script
 │   ├── helpers/                       # requireFixtureImage, makeThrowawayRepo, …
@@ -72,11 +72,3 @@ Fixture images share one image repository, `thunderjar-test-fixtures`, with the 
 
 Because both come from the same script, a branch restored from a fixture image shares history with the throwaway repository.
 
-## Open questions
-
-- **Breakdown of `src/`.** Only the parts the test boundaries depend on are named. The rest waits for the implementation.
-- **Enforcing the layout.** [140-tooling.md](140-tooling.md) mentions linting for file structure enforcement. Which rules apply here is not decided. _(Referenced by: [140-tooling.md](140-tooling.md#enforcing-folder-structure), which describes the script that enforces whatever is decided.)_
-- **Fixture image tags.** Whether the tag also carries a hash of the fixture's folder, so that a changed fixture is detected as missing (see the stale-images question in [120](120-test-boundaries.md#open-questions)).
-- **Post-run fixtures: hand-written or generated?** A hand-written Dockerfile can drift from what the real pipeline produces. The alternative is for the prepare step to produce post-run fixtures by running the real pipeline with the fake harness on `prerun-basic`.
-- **Should `prerun-basic` be a Dockerfile at all?** Thunderjar generates prerun images from configuration, so the prepare step could generate this one from a fixture project. That makes the prepare step depend on the code under test.
-- **More fixture images.** Likely candidates: a post-run image with a malformed harness result, and one with untracked or gitignored files.

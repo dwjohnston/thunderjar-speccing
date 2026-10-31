@@ -1,4 +1,4 @@
-# Experiment Results
+# Test Case Results
 
 What gets recorded once a container run's postrun image is committed — picks up from
 [080-docker-execution.md](080-docker-execution.md#process). The token-cost half of the
@@ -8,7 +8,7 @@ same recording step is [087-collecting-token-costs.md](087-collecting-token-cost
 
 Two stores, described in [070-data-architecture.md](070-data-architecture.md):
 
-1. **Run data store** — date, the permutation's experiment parameters and parameter
+1. **Run data store** — date, the permutation's test case parameters and parameter
    hash, measurements, cost, tokens, duration. Small and queryable — this is what "did
    this get worse since last week" queries run against. Covered below.
 2. **Image store** — the prerun/postrun images themselves. See
@@ -18,13 +18,14 @@ Two stores, described in [070-data-architecture.md](070-data-architecture.md):
 
 Measurements run **after** the postrun image is committed and pushed, in a short-lived
 [measurement container](030-terminology.md#measurement-container) started from that
-image, which is then discarded. The reasoning is in
+image, which is then discarded. A container run whose agent
+[failed or timed out](080-docker-execution.md#when-the-agent-fails) is not measured. The reasoning is in
 [080-docker-execution.md](080-docker-execution.md#why-commit-happens-before-measurement).
 
 Each of the task's measurements is an instrument plus a config. The instrument's logic
 runs host-side; the work it commands — globbing, reading files, writing a rendered test,
 running a test suite — happens inside the measurement container through the
-[measurement context](060-experiment-parameters.md#measurement-context).
+[measurement context](060-test-case-parameters.md#measurement-context).
 
 The single most useful consequence: **this is the same path as backfill.** Applying a
 measurement to a run from a year ago is not a different operation from measuring a fresh
@@ -125,10 +126,11 @@ type ContainerRunRecord = {
   postrunImage: string; // the tag, so the artifact is reachable from the record
   ranAt: string;
 
-  task: string; // the experiment's task, by name
+  task: string; // the test case's task, by name
 
   // each resolved parameter, by name and parameter hash
   parameters: Record<ParameterKind, { name: string; parameterHash: string }>;
+  harnessModel: { family: string; version: string; modelId: string }; // resolved pair
 
   result: Result;
   tokenCosts: TokenCosts; // see 087
@@ -148,13 +150,15 @@ type ContainerRunRecord = {
     baseImage:       { name: "node20",      parameterHash: "a01f…" },
     codeState:       { name: "baseline",    parameterHash: "b92c…" },
     promptSet:       { name: "snerk",       parameterHash: "c7d4…" },
-    harness:         { name: "claude-code", parameterHash: "d5e1…" },
-    model:           { name: "haiku",       parameterHash: "e3a8…" },
+    harnessModel:    { name: "claude-code@2.1.283/haiku-4-5", parameterHash: "d5e1…" },
     initialPrompt:   { name: "plain",       parameterHash: "f20b…" },
   },
+  harnessModel: { family: "claude-code", version: "2.1.283",
+    modelId: "claude-haiku-4-5-20251001" },
   result: { /* as above */ },
   tokenCosts: { /* as above */ },
-  execution: { startedAt: 1790692255104, finishedAt: 1790692297416, exitCode: 0 },
+  execution: { startedAt: 1790692255104, finishedAt: 1790692297416, exitCode: 0,
+    outcome: "completed" },
 }
 ```
 
@@ -174,8 +178,13 @@ type Execution = {
   startedAt: number; // epoch ms, harness start
   finishedAt: number; // epoch ms, harness exit
   exitCode: number; // the harness process's exit code
+  outcome: "completed" | "failed" | "timedOut";
 };
 ```
+
+`outcome` is derived from `exitCode`: `0` is `completed`, `124` is `timedOut`, anything
+else is `failed`. See
+[080-docker-execution.md](080-docker-execution.md#when-the-agent-fails).
 
 Duration is `finishedAt - startedAt`: the agent's execution only, not image pulls,
 container setup, or measurement. Because the file is in the postrun image, this is
@@ -188,7 +197,7 @@ harness — see `apiDurationMs` in
 ## Aggregation results
 
 Container runs aren't what gets compared. The unit of comparison is the **aggregation
-result**: the Results of every iteration of one permutation in one experiment execution,
+result**: the Results of every iteration of one permutation in one test case execution,
 combined. That holds even when there's only one iteration.
 
 ```
@@ -200,7 +209,7 @@ aggregation result = (execution ID, permutation hash) → the combined Results o
 ```
 
 Wherever the things being compared come from — permutations in the same execution,
-repeated executions of one experiment, or executions whose parameters [follow a moving target](060-experiment-parameters.md#parameters-that-follow-a-moving-target) —
+repeated executions of one test case, or executions whose parameters [follow a moving target](060-test-case-parameters.md#parameters-that-follow-a-moving-target) —
 comparing means comparing aggregation results. The only requirement is that they have
 the same shape, and backfilling measurements is what makes that achievable. Which ones
 to fetch and set side by side is the presentation layer's problem, not the store's.
@@ -327,24 +336,9 @@ instrument's own logic under test.
 A backfilled measure also triggers recomputing its permutation's
 [aggregation result](#aggregation-results).
 
+The resolved pair's family, version and model ID are stored for
+[re-collecting token costs](087-collecting-token-costs.md#backfilling-token-costs).
+
 Token costs are backfillable on the same terms, since the harness's result file is
 preserved in the image too — see
 [087-collecting-token-costs.md](087-collecting-token-costs.md#backfilling-token-costs).
-
-## Traces and transcripts
-
-A run's OTel trace and session transcript stay in its postrun image. To read them, pull
-the image and read them from its filesystem, same as everything else the run left behind.
-
-**Future:** a separate trace store, so viewing a trace doesn't need a full image pull —
-expected to be the first fast-follow after v1. See
-[020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1).
-
-## Open questions
-
-- **Comparing across a hash change.** The record stores full permutation hashes so a report
-  can decide what's comparable, but the policy is a reporting concern and belongs in
-  [110-cli-report-visualization.md](110-cli-report-visualization.md): when is it
-  legitimate to plot runs whose parameters differ, and how is that shown?
-- Whether the measurement context's shape is right — flagged in
-  [021-human-zone-out.md](021-human-zone-out.md) as not yet properly reviewed.

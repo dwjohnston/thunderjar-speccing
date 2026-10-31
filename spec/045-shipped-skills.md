@@ -1,9 +1,23 @@
 # Shipped Skills
 
 Thunderjar ships agent skills that run inside the user's own coding sessions, not inside
-experiments. Writing a good measurement is the hard part of capturing a test case, and
+test cases. Writing a good measurement is the hard part of capturing a test case, and
 it is easiest while the session that produced it is still in context. Assumes
 [User Experience](040-user-experience.md), whose three scenarios this page builds on.
+
+## Installing
+
+Skills are installed with [skills.sh](https://skills.sh), from Thunderjar's repository:
+
+```
+npx skills add <owner>/<repository>
+```
+
+```
+npx skills add dwjohnston/thunderjar
+```
+
+`thunderjar init` does not install them.
 
 ## `thunderjar-test-case`
 
@@ -13,7 +27,7 @@ measurements.
 ### Offering
 
 When a session matches one of the
-[experiment candidate scenarios](040-user-experience.md#experiment-candidates), the agent
+[test case candidate scenarios](040-user-experience.md#test-case-candidates), the agent
 asks once, at a natural stopping point:
 
 > Do you want to create a Thunderjar test case from this?
@@ -35,7 +49,7 @@ Measurements are the skill's main job. Once the user says yes, the agent:
 
 1. States, in one sentence, the outcome to be judged — taken from the scenario above.
 2. Proposes measurements, each naming its
-   [instrument](060-experiment-parameters.md#measuring-instruments--measurements) and
+   [instrument](060-test-case-parameters.md#measuring-instruments--measurements) and
    config, and says what it would have returned on this session.
 3. Checks each proposal against the files the session left behind, so the user sees a
    measurement pass or fail on real output before it is saved.
@@ -47,18 +61,8 @@ The agent prefers few, cheap, deterministic measurements over broad ones. For a
 
 ### What it creates
 
-The task folder `experiment-parameters/tasks/<name>/`, with the session's opening
+The task folder `test-case-parameters/tasks/<name>/`, with the session's opening
 request as its initial prompt in `initial-prompts/`, and the `measurements/` folder
-beside it. The experiment declaration and the other five parameters are left to the
+beside it. The test case declaration and the other four parameters are left to the
 user.
 
-## Open questions
-
-- **"Test case" vs "experiment".** The skill's wording says *test case*; the rest of the
-  spec, including [030-terminology.md](030-terminology.md), still says *experiment*.
-  Unresolved which term the user-facing surface uses, and whether a test case is the task
-  plus its measurements or the whole experiment.
-- Whether the skill should also help create the experiment declaration, or stop at the
-  task.
-- Whether checking a measurement against the session's files is enough, or the skill
-  should run it in a [measurement container](030-terminology.md#measurement-container).

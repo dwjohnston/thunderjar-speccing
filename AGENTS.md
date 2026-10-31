@@ -28,11 +28,7 @@ verify the exact original wording.
 
 ## Current phase
 
-We're actively defining out the project — filling in stub spec pages from the design
-conversation — while also deliberately constraining what's in scope for v1. When
-something comes up that's a reasonable idea but not needed for v1, prefer flagging it
-as a non-goal over speccing it out in detail. See
-[`spec/020-goals-non-goals.md`](spec/020-goals-non-goals.md).
+We're in the planning phase of lap one. See [launch-plan](./spec//002-launch-plan.md)
 
 ## Spec conventions
 
@@ -109,6 +105,8 @@ as a non-goal over speccing it out in detail. See
 - Update this file as we go. If the user gives a nudge or piece of guidance that reflects a
   general principle (not a one-off), suggest the AGENTS.md update and ask before adding it.
   Never update this file automatically/silently.
+  
+- Prefer mermaid js diagrams over ascii art diagrams. 
 
 
 ☝️ **Remember:** Err on the side of brevity. It is much easier for the human reader to read something and recognise that something is missing, and ask for more, than it is for a human to read and parse something and make the determination that the thing is not needed.
