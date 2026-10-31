@@ -22,7 +22,7 @@ All examples use one running scenario:
 
 ```
 $ thunderjar init
-Created thunderjar/
+Created .thunderjar/
   test-cases/
   test-case-parameters/
     baseImages/
@@ -45,7 +45,7 @@ Read test-case-parameters/
   promptSets      1 name
   harnessModels   1 family, 1 version, 2 models -> 2 pairs
   tasks           1 task, 1 initial prompt
-Wrote thunderjar/_generated/parameter-names.d.ts
+Wrote .thunderjar/_generated/parameter-names.d.ts
 ```
 
 ## `plan`

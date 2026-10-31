@@ -13,7 +13,7 @@ assertion (`as`), or a type annotation (`const harness: Harness = …`).
 ```ts
 // test-case-parameters/harnessModels/claude-code/index.ts
 export default declareHarness({
-  applyParameter: (ctx) => `RUN npm install -g @anthropic-ai/claude-code@${ctx.version}`,
+  applyParameter: (_config, ctx) => `RUN npm install -g @anthropic-ai/claude-code@${ctx.version}`,
   cli: (ctx) => `claude -p "${ctx.initialPrompt}" > ${ctx.resultPath}`,
 });
 ```
@@ -70,14 +70,14 @@ Anything Thunderjar generates — such as the parameter-name types described in
 — is written to a `_generated/` folder, never edited by hand, and never committed.
 
 ```
-thunderjar/
+.thunderjar/
 └── _generated/
     └── parameter-names.d.ts
 ```
 
 ```gitignore
 # .gitignore
-thunderjar/_generated/
+.thunderjar/_generated/
 ```
 
 - **Underscore, not a dot.** A dot-folder is hidden from most file listings and editors;

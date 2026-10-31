@@ -28,7 +28,7 @@ would do in one is done with the commands below. Command names are provisional.
 thunderjar init
 ```
 
-Scaffolds the `thunderjar/` configuration folder, laid out as in
+Scaffolds the `.thunderjar/` configuration folder, laid out as in
 [051-configuration-folder-structure.md](051-configuration-folder-structure.md). What it
 creates, and whether it includes an example test case, depends on
 [050-setup-and-configure.md](050-setup-and-configure.md).
@@ -227,7 +227,7 @@ Run from inside a git repository. Fetches the run's end state and creates the br
 
 - `--json` on every command that reports, for scripting.
 - Exit codes: success, configuration error and infrastructure error are distinct. A
-  configuration error is a problem in the user's `thunderjar/` folder, such as a missing
+  configuration error is a problem in the user's `.thunderjar/` folder, such as a missing
   file or an unknown parameter name. An infrastructure error is a problem in the
   environment, such as an unreachable Docker daemon.
 - Executions are addressed by execution ID and container runs by their ID.

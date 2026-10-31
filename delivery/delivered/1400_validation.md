@@ -23,7 +23,7 @@ Areas: A
 
 ## How to test
 
-Regular tests load a set of broken fixture `thunderjar/` folders, one per error above, and assert on stderr and the exit code.
+Regular tests load a set of broken fixture `.thunderjar/` folders, one per error above, and assert on stderr and the exit code.
 
 - `bun test`
 

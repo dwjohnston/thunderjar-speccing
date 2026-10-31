@@ -2,7 +2,7 @@
 
 The folder structure of the Thunderjar project itself: its source, its tests, and the fixtures those tests need.
 
-This is distinct from [051-configuration-folder-structure.md](051-configuration-folder-structure.md), which describes the `thunderjar/` folder inside a *user's* project.
+This is distinct from [051-configuration-folder-structure.md](051-configuration-folder-structure.md), which describes the `.thunderjar/` folder inside a *user's* project.
 
 No source code exists yet, so everything below is a proposal.
 
@@ -24,7 +24,7 @@ thunderjar/
 ├── test/
 │   ├── fixtures/
 │   │   ├── images/                    # fixture Docker images — see below
-│   │   ├── projects/                  # example user projects, each with a real thunderjar/ config folder
+│   │   ├── projects/                  # example user projects, each with a real .thunderjar/ config folder
 │   │   └── harnesses/
 │   │       └── fake-agent.js          # the fake harness's script
 │   ├── helpers/                       # requireFixtureImage, makeThrowawayRepo, …

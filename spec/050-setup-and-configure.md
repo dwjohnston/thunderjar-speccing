@@ -32,13 +32,13 @@ npx thunderjar init
 ```
 
 **Non-JS project.** There is no root `package.json`, so `init` creates one inside
-`thunderjar/` with Thunderjar as its dependency, and Thunderjar never touches the
+`.thunderjar/` with Thunderjar as its dependency, and Thunderjar never touches the
 project's root. This follows AWS CDK and Pulumi, which scaffold a self-contained
 TypeScript project beside an application in any language.
 
 ```
 npx thunderjar init
-cd thunderjar && npm install
+cd .thunderjar && npm install
 ```
 
 Either way, then from the project root:
@@ -52,18 +52,18 @@ npx thunderjar run is-prime-baseline
 Commands are run through the package manager (`npx`, `pnpm exec`, `bunx`, or a
 `package.json` script), not by invoking `node_modules/.bin/thunderjar` directly. See below.
 
-The CLI finds `thunderjar/` by walking up from the current directory to the nearest one.
-The location is fixed: `./thunderjar/`, with no flag or setting to move it. A monorepo
+The CLI finds `.thunderjar/` by walking up from the current directory to the nearest one.
+The location is fixed: `./.thunderjar/`, with no flag or setting to move it. A monorepo
 runs the CLI from each package that has its own.
 
 `init` creates:
 
-- `thunderjar/package.json`, **only when the project has no root `package.json`**;
-- `thunderjar/thunderjar.config.ts`;
+- `.thunderjar/package.json`, **only when the project has no root `package.json`**;
+- `.thunderjar/thunderjar.config.ts`;
 - the folder structure from [051-configuration-folder-structure.md](051-configuration-folder-structure.md);
 - a runnable **example test case** (a cheap model, one iteration, a trivial task), so
   `plan` and `run` work straight away and the example documents the layout;
-- `thunderjar/.gitignore`, ignoring `_generated/` and `.data/` (and `node_modules/` when
+- `.thunderjar/.gitignore`, ignoring `_generated/` and `.data/` (and `node_modules/` when
   `init` created the nested `package.json`). Everything else is committed, and the
   project's own `.gitignore` is untouched.
 
@@ -123,7 +123,7 @@ import { declareConfig, sqliteStore } from "thunderjar";
 
 export default declareConfig({
   imageStore: { repository: "ghcr.io/acme/thunderjar-images" },
-  runDataStore: sqliteStore({ path: "./thunderjar/.data/runs.sqlite" }),
+  runDataStore: sqliteStore({ path: "./.thunderjar/.data/runs.sqlite" }),
 });
 ```
 

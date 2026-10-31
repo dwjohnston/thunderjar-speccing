@@ -9,8 +9,6 @@ Glossary of project-specific terms, used consistently across all other spec page
 
 A **test case** consists of a matrix of **test case parameters** — the values that determine what happened and from what state, and whose combinations produce permutations. One of those parameters is the **initial prompt**: the first prompt given to the harness, i.e. what the agent is asked to do. A test case is about one **task**: the goal its initial prompts ask for, together with the measurements that judge it.
 
-🙋‍♂️ Really a test case is the 6 parameters + and then task measurements occur afterwards. 
-
 Associated with each task are its **task measurements**, which judge the outcome of a container run after the fact. They are not a test case parameter: they don't inform what runs or how many permutations there are, and they aren't part of the permutation hash. They live alongside the task because they're only meaningful for it, and every initial prompt of the task is judged by the same ones — see [051-configuration-folder-structure.md](051-configuration-folder-structure.md).
 
 The test case parameters are: **base image**, **code state**, **prompt set**, **harness/model pair**, and **initial prompt**. The task itself is named once per test case and is not varied.

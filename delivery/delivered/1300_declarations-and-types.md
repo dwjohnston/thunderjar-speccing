@@ -13,7 +13,7 @@ Areas: A
 ## Artifacts
 
 - `declareBaseImage`, `declareCodeState`, `declarePromptSet`, `declareHarness` (with models and versions), `declareInitialPrompt` and `declareTestCase` functions
-- Config loader that walks up to find `thunderjar/`
+- Config loader that walks up to find `.thunderjar/`
 - `thunderjar generate` command, which writes `_generated/parameter-names.d.ts`
 - `thunderjar plan <test case>` command, which lists the parameters the test case names
 
@@ -29,7 +29,7 @@ initialPrompt: plain, terse
 
 ## How to test
 
-Regular tests load a fixture `thunderjar/` folder and assert on `plan <test case>` stdout. A type test asserts that a test case naming an unknown prompt set, or a model absent from its family, fails to compile.
+Regular tests load a fixture `.thunderjar/` folder and assert on `plan <test case>` stdout. A type test asserts that a test case naming an unknown prompt set, or a model absent from its family, fails to compile.
 
 - `bun test`
 - `bun run typecheck`

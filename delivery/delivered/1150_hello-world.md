@@ -1,6 +1,6 @@
-# 1100: Hello world
+# 1150: Hello world
 
-`npx thunderjar` prints "hello world!", and the package, documentation page and CI pipeline exist.
+`npx thunderjar` prints "hello world!", and the package, documentation page and release pipeline exist.
 
 Areas: F
 
@@ -8,7 +8,7 @@ Areas: F
 
 - `thunderjar` package published to npm
 - Documentation page, live at a public URL
-- CI pipeline that tests and publishes on merge
+- Release pipeline that publishes on merge (tests run in the CI pipeline from [1100](1100_base-tooling.md))
 
 ## How to test
 
@@ -17,7 +17,7 @@ Verified by a human.
 1. 👷‍♂️ Run `npx thunderjar`.
 2. Expect the output `hello world!`.
 3. 👷‍♂️ Open the documentation page and expect it to load.
-4. 👷‍♂️ Merge a trivial change and expect CI to pass.
+4. 👷‍♂️ Merge a trivial change and expect CI to pass and the release pipeline to run.
 
 ## Human interventions
 

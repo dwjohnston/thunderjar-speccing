@@ -2,6 +2,14 @@
 
 What's in scope vs. explicitly not.
 
+## Goals
+
+- Allow the configuration of harnessModel pairs, prompt sets, code etc, via typescript configuration files. 
+- Run test cases with a command line interface. 
+- Prerun and post run images can be captured via docker. 
+- Measurements can be captured from post run images. 
+
+
 ## Non-goals (v1)
 
 - **Central model catalogue and ID transformations.** v1 uses explicit model-to-ID
@@ -53,7 +61,7 @@ What's in scope vs. explicitly not.
   [050-setup-and-configure.md](050-setup-and-configure.md#thunderjarconfigts).)
 
 - **Test cases in a different repository from the code.** Thunderjar reads commits from
-  the repository it runs in, so `thunderjar/` lives in the same repository as the code it
+  the repository it runs in, so `.thunderjar/` lives in the same repository as the code it
   test cases on. A setting pointing at another repository is deferred. (See
   [062-code-state.md](062-code-state.md#where-the-commit-comes-from).)
 

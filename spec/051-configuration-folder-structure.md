@@ -12,7 +12,7 @@ my-app/
 ├── prompts/
 │   ├── snerk.md                           # prompt files — what prompt sets check out
 │   └── glurk.md
-└── thunderjar/
+└── .thunderjar/
     ├── package.json                       # only for non-JS projects; created by `init`
     ├── .gitignore                         # created by `init`: _generated/, .data/ (+ node_modules/ if nested)
     ├── thunderjar.config.ts               # global config: stores, registry, test runner
@@ -57,7 +57,7 @@ my-app/
 
 - **The user's own files stay where they are.** Code and prompt files live in the normal
   project tree. Code state and prompt set declarations point at them by pinned commit
-  rather than copying them into `thunderjar/`.
+  rather than copying them into `.thunderjar/`.
 - **One folder per base image, code state or prompt set**, under its kind folder. Its
   name selects it; its content — `index.ts` plus bundled files — determines its hash.
 - **One folder per harness family**, under `test-case-parameters/harnessModels/`.
@@ -87,5 +87,5 @@ my-app/
 
 - What else `thunderjar.config.ts` holds beyond the stores and test runner.
 
-`thunderjar/` is a fixed location, found by walking up from the current directory. See
+`.thunderjar/` is a fixed location, found by walking up from the current directory. See
 [050-setup-and-configure.md](050-setup-and-configure.md#install-and-init).

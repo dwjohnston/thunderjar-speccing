@@ -55,8 +55,7 @@ entry's `determineHash` resolves its version; it does not replace the whole pair
 // test-case-parameters/codeStates/main/index.ts
 export default declareCodeState({
   determineHash: () => `git rev-parse origin/main`,
-  commit: (ctx) => ctx.resolvedHash,
-  applyParameter: () => `RUN npm ci`,
+  applyParameter: (_config, ctx) => `${checkoutCommit(ctx, ctx.resolvedHash)}\nRUN npm ci`,
 });
 ```
 
@@ -76,7 +75,7 @@ For the code state above, on an execution where `origin/main` is at `a1b2c3`:
 ```
 git rev-parse origin/main  → a1b2c3
 ctx.resolvedHash           = "a1b2c3"
-commit returns             "a1b2c3"
+checkoutCommit checks out  a1b2c3
 ```
 
 Use it rather than the moving name. A checkout of `main` has the same text on every
@@ -106,31 +105,61 @@ default export is wrapped in that kind's
 Each resolved parameter exposes the same function:
 
 ```ts
-applyParameter: (ctx) => string; // a Dockerfile fragment
+config?: C;                                     // optional, any shape
+applyParameter: (config: C, ctx) => string;     // a Dockerfile fragment
 ```
 
-`ctx` carries `resolvedHash` — see
-[Controlling the parameter hash](#ctxresolvedhash). A declaration that doesn't need it
-leaves the argument off.
+**What applying a parameter does is the parameter's own business.** Thunderjar doesn't
+clone, check out or copy anything on a parameter's behalf. A code state's fragment gets
+the codebase into `/workspace`, and a prompt set's puts its prompt files there.
 
-Building a permutation's prerun image is then a fold: concatenate each
-parameter's fragment, in the order below, and build the result. Code state and prompt
-set also declare a commit, which Thunderjar applies itself, ahead of their fragments —
-see [062-code-state.md](062-code-state.md#how-the-code-gets-into-the-image).
+`config` is a general-purpose value holder, typically holding a commit hash. It is passed
+to `applyParameter` as written, and typed from the declaration. It lives in the
+declaration file, so it is part of the parameter hash like everything else there.
+
+```ts
+// test-case-parameters/codeStates/baseline/index.ts
+export default declareCodeState({
+  config: { commit: "a1b2c3" },
+  applyParameter: (config, ctx) => `${checkoutCommit(ctx, config.commit)}\nRUN npm ci`,
+});
+```
+
+`ctx` carries:
+
+| Field | What it is |
+|---|---|
+| `ctx.dir` | The parameter's folder in the build context, so a fragment can `COPY ${ctx.dir}/files/ /workspace/` files kept beside its declaration. Those files are already part of its hash. It names the parameter's role (`parameters/codeState`), not its folder, so renaming the folder changes nothing. An initial prompt is one file, not a folder, and has no `ctx.dir`. |
+| `ctx.git.bundle(commit)` | Puts a git bundle of `commit` and its ancestors only in the build context, and returns its path. `checkoutCommit` builds on it — see [062-code-state.md](062-code-state.md#how-the-code-gets-into-the-image). |
+| `ctx.git.show(commit, path)` | Puts the file at `path` in `commit` in the build context, and returns its path — see [063-prompt-set.md](063-prompt-set.md#prompt-files-come-from-a-pinned-commit). |
+| `ctx.resolvedHash` | For a floating parameter — see [Controlling the parameter hash](#ctxresolvedhash). |
+| `ctx.version` | Harness/model pair only: the selected entry's resolved version. |
+
+`ctx.git` takes a commit hash, never a branch or tag, so the same declaration means the
+same content on every machine. The commits it names are read from the repository
+Thunderjar is run in, and checked before anything is built — see
+[062-code-state.md](062-code-state.md#where-the-commit-comes-from). A project whose
+fragments read no commits needs no repository.
+
+Building a permutation's prerun image is then a fold: concatenate each parameter's
+fragment, in the order below, and build the result. Thunderjar adds one line of its
+own, `WORKDIR /workspace`, before the code state's fragment.
 
 ```dockerfile
 FROM node:20-bookworm                                    # base image
-COPY code.bundle /tmp/code.bundle                        # Thunderjar: code state's commit
-RUN git clone /tmp/code.bundle /workspace \
-  && git -C /workspace checkout --detach a1b2c3 \
-  && git -C /workspace remote remove origin \
-  && rm /tmp/code.bundle
-WORKDIR /workspace
-RUN npm ci                                               # code state
-COPY prompt-set/CLAUDE.md /workspace/CLAUDE.md           # Thunderjar: prompt set's files
-COPY --from=thunderjar/harness-claude-code:2.1.283 \
-  /opt/claude /opt/claude                                # harness/model pair
+RUN npm install -g @anthropic-ai/claude-code@2.1.283     # harness/model pair
+WORKDIR /workspace                                       # Thunderjar
+COPY git/a1b2c3.bundle /tmp/code.bundle                  # code state (checkoutCommit)
+RUN git clone --quiet /tmp/code.bundle /workspace \
+  && git -C /workspace checkout --quiet --detach a1b2c3 \
+  && …
+RUN npm ci
+COPY git/e4f5a6/prompts/snerk.md /workspace/CLAUDE.md    # prompt set
+                                                         # initial prompt: usually empty
 ```
+
+The harness comes before the code state, so the slow install layer is shared by every
+code state and prompt set that use it, and changing the code doesn't rebuild it.
 
 Fragments are Dockerfile source rather than bare shell commands, because the
 prerun build *is* a Dockerfile — so layer caching stays explicit and the base
@@ -146,7 +175,7 @@ when the harness is invoked; its `applyParameter` returns an empty string:
 | Parameter | Build time | Run time |
 |---|---|---|
 | Base image | seed of the build | — |
-| Code state | commit, then dependencies / fixture generation | — |
+| Code state | the codebase, then dependencies / fixture generation | — |
 | Prompt set | prompt files | — |
 | Harness/model pair | installs the selected harness version | invoked via `cli` with the resolved version and model ID |
 | Initial prompt | — | `ctx.initialPrompt`, and the run's timeout |
@@ -171,14 +200,14 @@ export default declareBaseImage({
 
 ## Code state
 
-The codebase applied on top of the base image: a git commit, plus any setup it needs.
-Detail: [062-code-state.md](062-code-state.md).
+The codebase applied on top of the base image, usually a git commit, plus any setup it
+needs. Detail: [062-code-state.md](062-code-state.md).
 
 ```ts
 // test-case-parameters/codeStates/baseline/index.ts
 export default declareCodeState({
-  commit: "a1b2c3",
-  applyParameter: () => `RUN npm ci`,
+  config: { commit: "a1b2c3" },
+  applyParameter: (config, ctx) => `${checkoutCommit(ctx, config.commit)}\nRUN npm ci`,
 });
 ```
 
@@ -190,9 +219,9 @@ the worktree before the harness runs. Detail: [063-prompt-set.md](063-prompt-set
 ```ts
 // test-case-parameters/promptSets/snerk/index.ts
 export default declarePromptSet({
-  commit: "e4f5a6",
-  files: { "prompts/snerk.md": "CLAUDE.md" },
-  applyParameter: () => ``,
+  config: { commit: "e4f5a6" },
+  applyParameter: (config, ctx) =>
+    `COPY ${ctx.git.show(config.commit, "prompts/snerk.md")} /workspace/CLAUDE.md`,
 });
 ```
 
@@ -206,7 +235,7 @@ Declaration and hashing detail: [064-harness.md](064-harness.md); model mapping:
 ```ts
 // test-case-parameters/harnessModels/claude-code/index.ts
 export default declareHarness({
-  applyParameter: (ctx) =>
+  applyParameter: (_config, ctx) =>
     `RUN npm install -g @anthropic-ai/claude-code@${ctx.version}`,
   cli: (ctx) =>
     `claude -p "${ctx.initialPrompt}" --model ${ctx.modelId} ` +

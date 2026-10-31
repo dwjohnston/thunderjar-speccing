@@ -90,7 +90,7 @@ packages, commands, files and folders, pages, pipelines.>
   - Link a section anchor where one page covers several concerns.
   - Don't link tangentially related pages. The implementing agent can discover those if
     it needs them.
-  - Omit the section for stories with no spec coverage (e.g. `1100` hello world).
+  - Omit the section for stories with no spec coverage (e.g. `1150` hello world).
 - **Artifacts** are things you can point at:
   - "`thunderjar` is on npm"
   - "CI pipelines exists" 
@@ -120,7 +120,7 @@ packages, commands, files and folders, pages, pipelines.>
 Needs setup and checking by hand, so the 👷‍♂️ tasks are marked.
 
 ```markdown
-# 1100: Hello world
+# 1150: Hello world
 
 `npx thunderjar` prints "hello world!", and the package, docs page and CI pipeline exist.
 

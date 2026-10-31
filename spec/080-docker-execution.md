@@ -17,10 +17,10 @@ flowchart TD
         C{"Prerun image exists<br/>for this permutation's<br/>permutation hash?"}
         C -- Yes --> D["Pull existing prerun image"]
         C -- No --> E["Start FROM base image<br/>(test case parameter)"]
-        E --> F["Clone code state's commit<br/>to /workspace, run its setup"]
-        F --> G["Overlay prompt set files"]
-        G --> H["Install harness,<br/>at the pair's resolved version"]
-        H --> I["Tag as prerun image,<br/>push to image store"]
+        E --> H["Install harness,<br/>at the pair's resolved version"]
+        H --> F["Code state puts the codebase<br/>in /workspace, runs its setup"]
+        F --> G["Prompt set puts its<br/>prompt files in /workspace"]
+        G --> I["Tag as prerun image,<br/>push to image store"]
         D --> J["Prerun image ready"]
         I --> J
     end

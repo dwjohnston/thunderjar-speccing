@@ -7,10 +7,10 @@ parameter is, in [060-test-case-parameters.md](060-test-case-parameters.md).
 
 ## Declaration
 
-Lives at `thunderjar/test-cases/<name>.ts`.
+Lives at `.thunderjar/test-cases/<name>.ts`.
 
 ```ts
-// thunderjar/test-cases/is-prime-baseline.ts
+// .thunderjar/test-cases/is-prime-baseline.ts
 export default declareTestCase({
   baseImage: ["node20"],
   codeState: ["baseline"],

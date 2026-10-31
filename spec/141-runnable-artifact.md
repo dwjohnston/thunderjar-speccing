@@ -57,4 +57,4 @@ the package targets it.
 ## Not specified in v1
 
 - Whether a user's configuration may import other packages, and where those resolve from
-  in the nested `thunderjar/package.json` layout. Nothing needs it yet.
+  in the nested `.thunderjar/package.json` layout. Nothing needs it yet.

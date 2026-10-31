@@ -49,7 +49,7 @@ _(Referenced by: [051-configuration-folder-structure.md](051-configuration-folde
 ```ts
 // test-case-parameters/harnessModels/claude-code/index.ts
 export default declareHarness({
-  applyParameter: (ctx) =>
+  applyParameter: (_config, ctx) =>
     `RUN npm install -g @anthropic-ai/claude-code@${ctx.version}`,
   cli: (ctx) =>
     `claude -p "${ctx.initialPrompt}" --model ${ctx.modelId} ` +
@@ -120,7 +120,9 @@ _(Referenced by: [060-test-case-parameters.md](060-test-case-parameters.md),
 
 ## `applyParameter`: installing the tool
 
-The resolved version is passed to `applyParameter` as `ctx.version`. The fragment may
+The resolved version is passed to `applyParameter(config, ctx)` as `ctx.version`, beside
+the family's `config`. A version entry's `applyParameter` override gets the family's
+`config` too. The fragment may
 install it or copy it from a pinned harness image. Where those images come from is
 unresolved — see [020-goals-non-goals.md](020-goals-non-goals.md#to-revisit).
 
