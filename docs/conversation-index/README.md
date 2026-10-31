@@ -80,6 +80,16 @@ the final one. Search the earlier aliases too — most of the conversation preda
   the container) as a decision. Only indirect hints — see topic map below.
 - Any dollar-per-token conversion table or pricing config. Cost is only ever discussed as a
   number the harness hands you.
+- **Any TypeScript implementation mechanics for test-case/prompt declaration.** Grepped all
+  16 files for `declareTestCase`, `declareCodeState`, `declarePromptSet`, `parameter-names`,
+  `ambient`, `tsconfig`, `triple-slash`, `module augmentation`, `.d.ts`, `initialPrompt`,
+  `generic` (code sense) — zero hits beyond unrelated uses of the English word "generic".
+  The conversation never discusses how generated parameter-name types reach the TypeScript
+  program (no `include`/triple-slash/augmentation decision), nor the generic signature of
+  `declareTestCase`, nor the field shapes of `declareCodeState`'s or `declarePromptSet`'s
+  `commit`/`files` fields. These are implementation/API-surface questions with no source in
+  the design conversation; if they're answered anywhere, it's in `spec/` or `delivery/`, not
+  here.
 
 ## Topic map
 
@@ -162,6 +172,7 @@ the final one. Search the earlier aliases too — most of the conversation preda
 | 2026-09-29 | How/when measuring instruments are applied to a container run (inside vs outside, before vs after commit, instrument shape, backfill, built-ins, LLM-judge, skipped/errored outcomes) | 06, 09, 10, 11, 12, 15 |
 | 2026-09-29 | How token counts/cost are collected for a container run (OTel vs `--output-format json` vs transcript; which fields; sub-agents; dollars; per-harness; duration) | 01, 02, 03, 04, 05, 07, 08, 13 |
 | 2026-10-01 | David's ideas on test boundaries for Thunderjar itself (layers, mock/real boundary, fake harness, artifact assertions, lifecycle, smoke test, open questions) | 08, 15, plus targeted lines of 06, 09, 10, 11, 12, 13 |
+| 2026-10-14 | How generated parameter-name types reach the TS program for `declareTestCase` (tsconfig include / triple-slash / module augmentation); exact generic signature of `declareTestCase` restricting `initialPrompt`; exact field shapes of `declareCodeState`'s and `declarePromptSet`'s `commit`/`files` | none — full-corpus grep, zero hits; see "Not present in the conversation" |
 
 ## Notes for future queries
 

@@ -15,8 +15,8 @@ Everything below is a proposal. No code exists yet.
 | Run data store driver | `bun:sqlite` |
 | Hashing | `Bun.CryptoHasher` |
 | CLI argument parsing | Commander |
-| Linting and formatting | Biome |
-| Folder-structure enforcement | `scripts/sync-biome-layout.ts`, which writes rules into the Biome config |
+| Linting | oxlint |
+| Folder-structure enforcement | `scripts/sync-oxlint-layout.ts`, which writes rules into the oxlint config |
 | Versioning and release notes | Changesets (`.changeset/`) |
 | CI | GitHub Actions |
 | Dependency updates | Dependabot |
@@ -39,11 +39,12 @@ Everything below is a proposal. No code exists yet.
   ([050-setup-and-configure.md](050-setup-and-configure.md#thunderjarconfigts)). It is
   built into Bun, so there is no dependency to install.
 - **`Bun.CryptoHasher`** computes the SHA-256 behind parameter hashes
-  ([060-experiment-parameters.md](060-experiment-parameters.md)). Bun has no canonical-JSON
+  ([060-test-case-parameters.md](060-test-case-parameters.md)). Bun has no canonical-JSON
   function, so key-order independence is Thunderjar's own code.
 - **Commander** defines the commands in [100-cli-reference.md](100-cli-reference.md). Each
   command is one file under `src/commands/`, registered by the entry point in `src/cli/`.
-- **Biome** does linting and formatting in one tool, so there is one config file.
+- **oxlint** lints the code, configured by `.oxlintrc.json`. It does not format; formatting is
+  an open question below.
 - **Changesets** versions and publishes the `thunderjar` package described in
   [141-runnable-artifact.md](141-runnable-artifact.md). A change that affects users adds a
   file under `.changeset/` saying which bump it needs and what to put in the changelog.
@@ -70,18 +71,19 @@ Everything below is a proposal. No code exists yet.
 
 ## Enforcing folder structure
 
-Biome's built-in rules cover naming and imports, not where a file may live. What it offers
-instead is scoping: a rule or a [GritQL plugin](https://biomejs.dev/linter/plugins/) can be
-limited to a set of globs. The script turns a description of the layout into that scoping.
+oxlint's built-in rules cover naming and imports, not where a file may live. What it offers
+instead is scoping: `overrides` apply a rule's options to a set of globs. The script turns a
+description of the layout into that scoping.
 
 ### How it works
 
 1. The layout is written once, as data, in `scripts/layout.ts`: each folder under `src/` and
-   `test/`, what it may contain, and what it may import from.
-2. `scripts/sync-biome-layout.ts` reads that file and rewrites the generated section of
-   `biome.json`.
-3. `bun run lint` runs the script, then `biome check`. CI additionally fails if running the
-   script changes `biome.json`, so the committed config can't drift from the layout.
+   `test/`, what it may contain, and what it may import from. An entry covers the files
+   directly inside its folder, so no two entries match the same file.
+2. `scripts/sync-oxlint-layout.ts` reads that file and rewrites the generated section of
+   `.oxlintrc.json`.
+3. `bun run lint` runs the script, then `oxlint`. CI additionally fails if running the
+   script changes `.oxlintrc.json`, so the committed config can't drift from the layout.
 
 ```ts
 // scripts/layout.ts
@@ -92,63 +94,52 @@ export const layout = {
 };
 ```
 
-The script owns one marked region of `biome.json` and leaves the rest alone, so hand-written
-settings such as formatter options are untouched:
+The script owns one marked region of `.oxlintrc.json` and leaves the rest alone, so
+hand-written settings are untouched:
 
 ```jsonc
 {
-  "formatter": { "indentStyle": "space" },        // hand-written
+  "rules": { "eqeqeq": "error" },                 // hand-written
 
-  // sync-biome-layout: begin — generated, do not edit
+  // sync-oxlint-layout: begin — generated, do not edit
   "overrides": [
     {
-      "includes": ["src/cli/**"],
-      "linter": { "rules": { "style": { "noRestrictedImports": { "level": "error",
-        "options": { "patterns": [{ "group": ["**/adapters/**"], "message": "src/cli may not import adapters" }] }
-      } } } }
+      "files": ["src/cli/*.ts"],
+      "rules": {
+        "no-restricted-imports": ["error", {
+          "patterns": [{ "group": ["**/adapters/**"], "message": "src/cli may not import adapters" }]
+        }]
+      }
     }
   ]
-  // sync-biome-layout: end
+  // sync-oxlint-layout: end
 }
 ```
 
-Biome's config permits comments (`biome.jsonc`), which is what lets the markers sit inside
-the file. Whether the script edits that file textually between markers, or parses and
-re-serialises it, is open below.
+`.oxlintrc.json` permits comments, which is what lets the markers sit inside the file. Whether
+the script edits the file textually between markers, or parses and re-serialises it, is open
+below.
 
-### What it can enforce
+### What it enforces
 
-- **Import direction between folders.** Generated as per-folder `noRestrictedImports`
-  overrides. This is the part Biome supports directly.
-- **File names within a folder.** Generated as per-folder `useFilenamingConvention` options.
-- **Files in the wrong place.** Not a built-in rule. Proposed: a generated GritQL plugin that
-  reports on the program node of any file it runs on, scoped by the plugin's `includes` to the
-  folders where no file is allowed (everything under `src/` that no layout entry covers). A
-  file there is then a lint error with a message naming the layout page.
+- **Import direction between folders.** Generated as per-folder `no-restricted-imports`
+  overrides, with a `patterns` entry for every folder the layout does not list in `mayImport`.
+- **File names within a folder.** Generated as per-folder `unicorn/filename-case` overrides.
+  This covers the casing of names only, not which names are allowed.
+- **Files in the wrong place.** oxlint has no rule for this, so `sync-oxlint-layout.ts
+  --check` reports any file under `src/` or `test/` that matches no entry's `allowedFiles`,
+  with a message naming [150-repository-layout.md](150-repository-layout.md). `bun run lint`
+  runs it.
 
 ## Open questions
 
-- **Does the "wrong place" plugin work?** It relies on a plugin scoped by `includes` firing
-  once per file. Biome's plugin documentation says nothing about matching a file path inside a
-  pattern, so scoping is the only lever. Needs a spike before this is relied on.
-- **Which rules apply.** Which folders get an import restriction, and whether non-source
-  folders (`scripts/`, `test/fixtures/`) are covered at all. See also
-  [150-repository-layout.md](150-repository-layout.md#open-questions).
-- **Editing `biome.json`.** Textual replacement between markers keeps comments and hand-written
-  formatting. Parse and re-serialise is simpler but loses comments.
-- **Where the layout data lives.** `scripts/layout.ts` as above, or derived from a tree in
-  [150-repository-layout.md](150-repository-layout.md) so the spec and the lint rules
-  can't disagree.
-- **Biome version.** Plugins and `overrides` behaviour have changed between major versions;
-  pin an exact version, as for Bun.
-- **Which tests run in CI.** Pull requests run `bun test`; whether that includes the Docker
-  image tests (layer 3) is open in
-  [120-test-boundaries.md](120-test-boundaries.md#open-questions), as is the smoke test's
-  trigger. Fixture images would need building on the runner, or pulling.
-- **Where the docs source lives.** VitePress reads from `docs/`, which in this repository
-  holds the design conversation. Whether the docs site is the pages in `spec/` or a separate
-  user-facing set is not decided, and neither is its place in
-  [150-repository-layout.md](150-repository-layout.md).
-- **Requiring a changeset.** Whether a pull request without one fails CI, or only warns.
-- **Commander confirmed?** Chosen on the strength of familiarity; nothing else in the spec
-  depends on it.
+- **Formatting.** oxlint does not format. Options: *oxfmt* (the Oxc project's formatter, from
+  the same toolchain), *prettier*, or *none*.
+- **Editing the config.** *textual-markers* (replace the text between the markers) or
+  *reserialise* (parse the file and write it back, losing hand-written comments).
+- **Wrong-place check.** *script-checked* (as above) or *js-plugin* (an oxlint JS plugin that
+  reports on the program node of files in uncovered folders, so the error appears in the
+  editor). The JS plugin API is in alpha.
+- **Override merging.** How oxlint combines options when more than one override matches a
+  file is undocumented; the layout avoids it by giving each file one entry. Verify by test
+  before relying on it.

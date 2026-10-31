@@ -8,7 +8,7 @@ Getting the application running, plus a high-level configuration overview that r
   itself runs on Bun, but users don't need to install Bun separately. See
   [How the CLI gets Bun](#how-the-cli-gets-bun).
 - **Docker**, and **git**.
-- Thunderjar runs inside the **git repository holding the code** it experiments on, with
+- Thunderjar runs inside the **git repository holding the code** it test cases on, with
   enough history for every commit its parameters name. In CI that means checking out
   with full history (e.g. `fetch-depth: 0`). See
   [062-code-state.md](062-code-state.md#where-the-commit-comes-from).
@@ -32,13 +32,13 @@ npx thunderjar init
 ```
 
 **Non-JS project.** There is no root `package.json`, so `init` creates one inside
-`thunderjar/` with Thunderjar as its dependency, and Thunderjar never touches the
+`.thunderjar/` with Thunderjar as its dependency, and Thunderjar never touches the
 project's root. This follows AWS CDK and Pulumi, which scaffold a self-contained
 TypeScript project beside an application in any language.
 
 ```
 npx thunderjar init
-cd thunderjar && npm install
+cd .thunderjar && npm install
 ```
 
 Either way, then from the project root:
@@ -52,18 +52,18 @@ npx thunderjar run is-prime-baseline
 Commands are run through the package manager (`npx`, `pnpm exec`, `bunx`, or a
 `package.json` script), not by invoking `node_modules/.bin/thunderjar` directly. See below.
 
-The CLI finds `thunderjar/` by walking up from the current directory to the nearest one.
-The location is fixed: `./thunderjar/`, with no flag or setting to move it. A monorepo
+The CLI finds `.thunderjar/` by walking up from the current directory to the nearest one.
+The location is fixed: `./.thunderjar/`, with no flag or setting to move it. A monorepo
 runs the CLI from each package that has its own.
 
 `init` creates:
 
-- `thunderjar/package.json`, **only when the project has no root `package.json`**;
-- `thunderjar/thunderjar.config.ts`;
+- `.thunderjar/package.json`, **only when the project has no root `package.json`**;
+- `.thunderjar/thunderjar.config.ts`;
 - the folder structure from [051-configuration-folder-structure.md](051-configuration-folder-structure.md);
-- a runnable **example experiment** (a cheap model, one iteration, a trivial task), so
+- a runnable **example test case** (a cheap model, one iteration, a trivial task), so
   `plan` and `run` work straight away and the example documents the layout;
-- `thunderjar/.gitignore`, ignoring `_generated/` and `.data/` (and `node_modules/` when
+- `.thunderjar/.gitignore`, ignoring `_generated/` and `.data/` (and `node_modules/` when
   `init` created the nested `package.json`). Everything else is committed, and the
   project's own `.gitignore` is untouched.
 
@@ -105,8 +105,9 @@ under Credentials.
 
 ## Credentials
 
-Each [harness](064-harness.md#requiredenv-credentials) declares the names of the
-environment variables its agent needs (`requiredEnv`). The user exports them in the shell
+Each [harness family](064-harness.md#requiredenv-credentials) declares the names of
+the environment variables its agent needs (`requiredEnv`); a selected version may
+override the list. The user exports them in the shell
 or CI secret store that runs Thunderjar. Thunderjar passes only those variables into that
 harness's containers, and fails before building anything if one is unset.
 
@@ -122,7 +123,7 @@ import { declareConfig, sqliteStore } from "thunderjar";
 
 export default declareConfig({
   imageStore: { repository: "ghcr.io/acme/thunderjar-images" },
-  runDataStore: sqliteStore({ path: "./thunderjar/.data/runs.sqlite" }),
+  runDataStore: sqliteStore({ path: "./.thunderjar/.data/runs.sqlite" }),
 });
 ```
 
@@ -138,7 +139,7 @@ Three rules, all of the same shape: config names things, never holds secrets.
 
 | What | How it authenticates | Who reads it |
 |---|---|---|
-| Harness (agent API key) | `requiredEnv` on the harness declaration | Passed into that harness's containers |
+| Harness (agent API key) | `requiredEnv` on the harness family declaration | Passed into that harness's containers |
 | Run data store (remote) | An env var named in the config, holding a connection URL with credentials, e.g. `urlEnv: "THUNDERJAR_DB_URL"` | The Thunderjar process on the host. No container sees it. |
 | Image store | The user's existing `docker login` for the registry. Thunderjar holds no registry credentials. In CI the pipeline logs in first. | Docker |
 
@@ -146,10 +147,3 @@ A connection URL (`postgres://user:password@host/db`) is the one near-standard w
 authenticate to a remote database, and the `DATABASE_URL` convention. Cloud IAM tokens and
 secrets managers are later store constructors behind the same interface.
 
-## Open questions
-
-- Sharing the run data store between CI and a developer's machine. See
-  [071-data-persistence.md](071-data-persistence.md).
-
-- Harnesses whose required variables depend on the model's provider (Bedrock, Vertex).
-  v1 declares one harness per provider.

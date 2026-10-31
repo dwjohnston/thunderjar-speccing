@@ -14,9 +14,9 @@ would do in one is done with the commands below. Command names are provisional.
 | [`init`](#init) | Scaffold the configuration folder. |
 | [`doctor`](#doctor) | Check that the environment is ready to run. |
 | [`generate`](#generate) | Emit the typed parameter names. |
-| [`plan`](#plan) | Dry run: show what an experiment would do. |
-| [`run`](#run) | Run an experiment: one experiment execution. |
-| [`executions`](#executions) | List past experiment executions. |
+| [`plan`](#plan) | Dry run: show what a test case would do. |
+| [`run`](#run) | Run a test case: one test case execution. |
+| [`executions`](#executions) | List past test case executions. |
 | [`show`](#show) | Show recorded results for an execution or a container run. |
 | [`compare`](#compare) | Compare two executions. |
 | [`remeasure`](#remeasure) | Apply the current measurements to past runs. |
@@ -28,9 +28,9 @@ would do in one is done with the commands below. Command names are provisional.
 thunderjar init
 ```
 
-Scaffolds the `thunderjar/` configuration folder, laid out as in
+Scaffolds the `.thunderjar/` configuration folder, laid out as in
 [051-configuration-folder-structure.md](051-configuration-folder-structure.md). What it
-creates, and whether it includes an example experiment, depends on
+creates, and whether it includes an example test case, depends on
 [050-setup-and-configure.md](050-setup-and-configure.md).
 
 ### `doctor`
@@ -40,12 +40,12 @@ thunderjar doctor
 ```
 
 A preflight for the setup described in
-[050-setup-and-configure.md](050-setup-and-configure.md). It runs no experiment and costs
+[050-setup-and-configure.md](050-setup-and-configure.md). It runs no test case and costs
 nothing. It checks that:
 
 - the Docker daemon is reachable;
 - the registry accepts a push to the image store repository;
-- every environment variable named by a harness's `requiredEnv` is set, and any variable
+- every environment variable required by declared harness versions is set, and any variable
   the run data store names (e.g. `urlEnv`) is set;
 - the run data store can be opened;
 - the configuration loads.
@@ -58,15 +58,15 @@ Each check reports pass or fail, with the reason on failure. Exits non-zero if a
 thunderjar generate
 ```
 
-Reads the folder names under `experiment-parameters/` and writes
+Reads parameter names and harness family version/model maps under
+`test-case-parameters/` and writes
 `_generated/parameter-names.d.ts`, so a misspelled or deleted parameter is a type error in
-an experiment file. See [055-declaring-experiments.md](055-declaring-experiments.md#typed-names).
-Whether this is a standalone command or runs implicitly before the others is open there.
+a test case file. See [055-declaring-test-cases.md](055-declaring-test-cases.md#typed-names).
 
 ### `plan`
 
 ```
-thunderjar plan <experiment>
+thunderjar plan <test case>
 ```
 
 Example:
@@ -77,15 +77,37 @@ thunderjar plan is-prime-baseline
 
 Shows what `run` would do, without running anything and without cost:
 
-- the matrix shape and the permutations it produces,
-- each permutation's permutation hash, with floating parameters resolved,
-- which prerun images already exist and would be reused, and which would be built,
+- the parameters the test case selects, each with its parameter hash, with floating
+  parameters resolved,
+- the matrix shape and the permutations it produces, in the
+  [stable listing order](055-declaring-test-cases.md#a-test-case-is-a-matrix),
+- each permutation's prerun image name, which carries its permutation hash, and whether
+  that image already exists and would be reused or would be built,
 - how many container runs there would be (permutations × iterations).
+
+```
+$ thunderjar plan is-prime-baseline
+baseImage:     node20 (a91c03e7)
+codeState:     baseline (5be2d814)
+promptSet:     snerk (3f2a91c0), glurk (b71e44d2)
+harnessModel:  claude-code@2.1.283/haiku-4-5 (0d6f7a3b), codex@0.9.0/gpt-luna (c48e1f92)
+task:          is-prime
+initialPrompt: plain (e2907b55), terse (7a13c6d8)
+
+Matrix shape: 1/1/2/2/2 (8 permutations × 5 iterations = 40 container runs)
+
+ 1  node20 | baseline | snerk | claude-code@2.1.283/haiku-4-5 | plain
+    prerun-h4f9a21c8 (exists, reused)
+
+ 2  node20 | baseline | snerk | claude-code@2.1.283/haiku-4-5 | terse
+    prerun-h9c2e07ab (will build)
+ …
+```
 
 ### `run`
 
 ```
-thunderjar run <experiment>
+thunderjar run <test case>
 ```
 
 Example:
@@ -94,14 +116,13 @@ Example:
 thunderjar run is-prime-baseline
 ```
 
-Runs one experiment execution: resolves the matrix, then for each permutation runs each
+Runs one test case execution: resolves the matrix, then for each permutation runs each
 iteration as a container run, as described in
 [080-docker-execution.md](080-docker-execution.md). Prints the execution ID, which is
 what the other commands take.
 
 - **Human output:** progress per permutation and iteration, then a summary.
-- **Scripted output:** `--json` prints a JSON summary. The exit code distinguishes a
-  success from a regression and from an infrastructure error. See
+- **Scripted output:** `--json` prints a JSON summary. See
   [CI workflows](040-user-experience.md#ci-workflows).
 
 Options to narrow a run (for example to a single permutation) are not settled.
@@ -109,7 +130,7 @@ Options to narrow a run (for example to a single permutation) are not settled.
 ### `executions`
 
 ```
-thunderjar executions [<experiment>]
+thunderjar executions [<test case>]
 ```
 
 Example:
@@ -118,7 +139,7 @@ Example:
 thunderjar executions is-prime-baseline
 ```
 
-Lists past experiment executions, newest first: execution ID, experiment, date. Exists so
+Lists past test case executions, newest first: execution ID, test case, date. Exists so
 there are IDs to give to `show`, `compare`, `remeasure` and `restore`.
 
 ### `show`
@@ -142,7 +163,7 @@ given:
 - **A container run** shows that one iteration: its parameters, measures, cost, tokens
   and duration.
 
-An experiment name can stand in for an execution ID, meaning its latest execution.
+A test case name can stand in for an execution ID, meaning its latest execution.
 Supports `--json`.
 
 ### `compare`
@@ -157,15 +178,16 @@ Example:
 thunderjar compare 01K4X9J2E8MQZ3V7R5T0WABCDE 01K5A2B7C9D4F6G8H0JKMNPQRS
 ```
 
-Compares two executions' aggregation results. Which comparisons are legitimate when
-permutation hashes differ, and how that is shown, is the open question in
-[085-experiment-results.md](085-experiment-results.md#open-questions), and belongs in
-[110-cli-report-visualization.md](110-cli-report-visualization.md). Supports `--json`.
+Compares two executions' aggregation results. It reports differences and makes no
+judgement about them: Thunderjar has no notion of a regression (see
+[020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1)). Example output is in
+[110-cli-report-visualization.md](110-cli-report-visualization.md#compare). Supports
+`--json`.
 
 ### `remeasure`
 
 ```
-thunderjar remeasure <experiment | execution>
+thunderjar remeasure <test case | execution>
 ```
 
 Example:
@@ -179,11 +201,11 @@ Applies the measurements that currently exist on the filesystem to past containe
 without rerunning the agent. Each run is measured in a new
 [measurement container](030-terminology.md#measurement-container) started from its
 postrun image, and the new measures are added to its recorded
-[result](085-experiment-results.md#the-result-record). This is the same path as the
+[result](085-test-case-results.md#the-result-record). This is the same path as the
 original measurement, not a separate one.
 
 - **An execution** remeasures exactly the container runs in it.
-- **An experiment** remeasures every past execution of it.
+- **A test case** remeasures every past execution of it.
 
 ### `restore`
 
@@ -204,11 +226,11 @@ Run from inside a git repository. Fetches the run's end state and creates the br
 ## Conventions
 
 - `--json` on every command that reports, for scripting.
-- Exit codes: success, and infrastructure error are
-  distinct.
-- Executions are addressed by execution ID and container runs by their ID. How a
-  container run is named on the command line is open in
-  [090-restore-purge.md](090-restore-purge.md#open-questions).
+- Exit codes: success, configuration error and infrastructure error are distinct. A
+  configuration error is a problem in the user's `.thunderjar/` folder, such as a missing
+  file or an unknown parameter name. An infrastructure error is a problem in the
+  environment, such as an unreachable Docker daemon.
+- Executions are addressed by execution ID and container runs by their ID.
 
 ## Out of scope for the first pass
 
@@ -216,15 +238,7 @@ Run from inside a git repository. Fetches the run's end state and creates the br
   [020-goals-non-goals.md](020-goals-non-goals.md#non-goals-v1).
 - **`build`**, building and pushing prerun images without running the harness. Likely to
   become useful for testing Thunderjar itself.
-- **`list`** for declared experiments, parameters and tasks. These are files in the
+- **`list`** for declared test cases, parameters and tasks. These are files in the
   configuration folder.
 - **`purge`.** See [090-restore-purge.md](090-restore-purge.md#purge).
 
-## Open questions
-
-- **`compare` as its own command.** It may be a mode of `show`, for example
-  `show <a> --against <b>`.
-- **`executions` as its own command.** It may be unnecessary if `show` with no argument
-  lists recent executions.
-- **Narrowing a `run`.** Whether and how to run a subset of permutations.
-- **Exit codes.** The exact values, and what counts as a regression.

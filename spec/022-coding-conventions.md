@@ -1,7 +1,7 @@
 # Coding Conventions
 
 Conventions for the TypeScript a Thunderjar user writes — parameter declarations,
-task declarations, experiment declarations — and so for every example of that code in
+task declarations, test case declarations — and so for every example of that code in
 this spec.
 
 ## `declareX()` functions, not bare exports
@@ -11,28 +11,26 @@ function for its kind. Never a bare object, and never typed with `satisfies`, a 
 assertion (`as`), or a type annotation (`const harness: Harness = …`).
 
 ```ts
-// experiment-parameters/harnesses/claude-code/index.ts
+// test-case-parameters/harnessModels/claude-code/index.ts
 export default declareHarness({
-  version: "2.1.283",
-  applyParameter: () => `RUN npm install -g @anthropic-ai/claude-code@2.1.283`,
+  applyParameter: (_config, ctx) => `RUN npm install -g @anthropic-ai/claude-code@${ctx.version}`,
   cli: (ctx) => `claude -p "${ctx.initialPrompt}" > ${ctx.resultPath}`,
-  collectTokenCosts: (raw) => { /* … */ },
 });
 ```
 
 Not any of these:
 
 ```ts
-export default { version: "2.1.283", /* … */ };                        // untyped
-export default { version: "2.1.283", /* … */ } satisfies Harness;     // satisfies
-export default { version: "2.1.283", /* … */ } as Harness;            // assertion
-const harness: Harness = { version: "2.1.283", /* … */ };             // annotation
+export default { cli: (ctx) => "claude", /* … */ };                        // untyped
+export default { cli: (ctx) => "claude", /* … */ } satisfies Harness;     // satisfies
+export default { cli: (ctx) => "claude", /* … */ } as Harness;            // assertion
+const harness: Harness = { cli: (ctx) => "claude", /* … */ };             // annotation
 export default harness;
 ```
 
 Why a function:
 
-- **The types come for free.** `ctx` and `raw` above are typed by the function's
+- **The types come for free.** `ctx` above is typed by the function's
   parameter, with nothing written at the call site. A bare object gets none of that.
 - **It's the only form that can't be got subtly wrong.** `as` silences errors instead of
   reporting them; `satisfies` and annotations are easy to forget, and forgetting them
@@ -50,36 +48,41 @@ One function per kind:
 | Base image | `declareBaseImage` |
 | Code state | `declareCodeState` |
 | Prompt set | `declarePromptSet` |
-| Harness | `declareHarness` |
-| Model | `declareModel` |
+| Harness family | `declareHarness` |
+| Family model map | `declareHarnessModels` |
+| Family version map | `declareHarnessVersions` |
+| Token-cost collector | `declareTokenCostCollector` |
 | Initial prompt | `declareInitialPrompt` |
 | Measurement | `declareMeasurement` |
-| Experiment | `declareExperiment` |
+| Test case | `declareTestCase` |
 
-Measurement and experiment aren't experiment parameters — a measurement is associated
-with a task, and an experiment is a matrix *over* parameters, not one of them — but
+The family, maps and collector form a [family declaration](064-harness.md#family-declaration);
+the selected pair is the parameter value.
+
+Measurement and test case aren't test case parameters — a measurement is associated
+with a task, and a test case is a matrix *over* parameters, not one of them — but
 their files are Thunderjar configuration all the same, so the same rule applies.
 
 ## Generated files go in `_generated/`, and are git-ignored
 
 Anything Thunderjar generates — such as the parameter-name types described in
-[055-declaring-experiments.md](055-declaring-experiments.md#typed-names)
+[055-declaring-test-cases.md](055-declaring-test-cases.md#typed-names)
 — is written to a `_generated/` folder, never edited by hand, and never committed.
 
 ```
-thunderjar/
+.thunderjar/
 └── _generated/
     └── parameter-names.d.ts
 ```
 
 ```gitignore
 # .gitignore
-thunderjar/_generated/
+.thunderjar/_generated/
 ```
 
 - **Underscore, not a dot.** A dot-folder is hidden from most file listings and editors;
   generated types are something a user should be able to find and read when a name
   doesn't type-check. The underscore still marks the folder as not-yours.
-- **Git-ignored**, because it is derived entirely from the folder structure. Committing it
+- **Git-ignored**, because it is derived from declaration names and family maps. Committing it
   invites a stale copy that disagrees with the folders it was generated from.
 
